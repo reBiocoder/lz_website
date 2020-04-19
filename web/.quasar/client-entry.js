@@ -48,6 +48,12 @@ import qboot_Bootnotify_defaults from 'boot/notify_defaults'
 
 
 
+Vue.config.devtools = true
+Vue.config.productionTip = false
+
+
+
+console.info('[Quasar] Running SPA.')
 
 
 

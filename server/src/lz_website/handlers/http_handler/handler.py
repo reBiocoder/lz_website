@@ -1,4 +1,4 @@
-from os.path import dirname, realpath, basename, join,exists
+from os.path import dirname, realpath, basename, join, exists
 from plotnine import *
 import pandas as pd
 import numpy as np
@@ -15,7 +15,7 @@ from lz_website.util.query_util import (use_locustag_get_result,
                                         create_padj_and_log2_collection,
                                         random_data, random_column,
                                         get_search_table, get_search_one,
-                                        get_environment_result,get_all_keys,
+                                        get_environment_result, get_all_keys,
                                         get_image_json)
 from lz_website.auth.hashers import make_password, set_cookie, login_required
 from lz_website.util.redis_util import (insert_data,
@@ -53,6 +53,7 @@ class CustomBasicHandler(HttpBasicHandler):
     """
     :type自定义handler
     """
+
     def prepare(self):
         self.application.settings["cookie_secret"] = "12345"
         print(self.current_user)
@@ -92,8 +93,8 @@ class UploadFileHandler(CustomBasicHandler):
                     with open(file_path, 'wb') as f:
                         f.write(raw_file.body)
                     get_logger().info("%s上传了%s, 保存的名称为%s",
-                        str(self.request.remote_ip),raw_file_name, basename(file_path)
-                    )
+                                      str(self.request.remote_ip), raw_file_name, basename(file_path)
+                                      )
                     # 将文件导入Mongodb中
                     sys_path = file_path
                     command = "mongoimport  --db lz_database --collection " + col_name + " --type csv --headerline --ignoreBlanks --file " + sys_path
@@ -127,7 +128,8 @@ class LoginHandler(CustomBasicHandler):
                 if validate_user_result["password"] == make_password(password):
                     # set cookie
                     self.set_secure_cookie("session_id", set_cookie(username, real_name), expires_days=1, path='/')
-                    self.send_response_data(MesCode.success, {"real_name": real_name, "username": username}, info="身份验证成功")
+                    self.send_response_data(MesCode.success, {"real_name": real_name, "username": username},
+                                            info="身份验证成功")
                 else:
                     self.send_response_data(MesCode.fail, {'res': 'password error'}, info="密码错误")
         else:
@@ -161,6 +163,7 @@ class RegisterHandler(CustomBasicHandler):
 
 class IndexHandler(CustomBasicHandler):
     """主页展示表格中的数据"""
+
     async def get_process(self, *args, **kwargs):
         data = await random_data('tss', 'utex')
         if type(data[0]) == bytes:
@@ -174,6 +177,7 @@ class IndexHandler(CustomBasicHandler):
 
 class IndexColHandler(CustomBasicHandler):
     """主页表格中的列名"""
+
     async def get_process(self, *args, **kwargs):
         data = await random_column('tss', 'utex')
         col = []
@@ -211,29 +215,33 @@ class SearchEnvironmentHandler(CustomBasicHandler):
 
 class EnvironmentImageHandler(CustomBasicHandler):
     async def post_process(self, *args, **kwargs):
+        print(self.request.headers)
         """环境结果, 得到火山图"""
         from mg_app_framework.web import StaticFileBasicHandler
         keywords = self.data["q"]
         raw_result = await get_image_json(keywords)
         json_result = json.dumps(raw_result)
         # 判断静态文件夹中是否存在该图片
-        file_path = join(get_image_upload_path(), str(keywords)+".png")
+        file_path = join(get_image_upload_path(), str(keywords) + ".png")
         if exists(file_path):  # 如果该图片已经存在
             get_logger().info("图片已经存在")
         else:
             #  #################图片处理######################
             df = pd.read_json(json_result)
             img = ggplot(df, aes('log2', "-1*np.log10(padj)", color='factor(threshold)')) + \
-                theme(axis_line=element_line(color="black"), panel_background=element_rect(fill='white')) + \
-                geom_point() + \
-                scale_color_manual(values=("grey", "red")) + \
-                geom_hline(aes(yintercept=2, ), color="gray", linetype='dotted') + \
-                geom_vline(aes(xintercept=-1), color="gray", linetype='dotted') + \
-                geom_vline(aes(xintercept=1), color="gray", linetype='dotted') + \
-                labs(title=keywords) + xlab("log2FoldChange") + ylab("-1*log10(padj)")
+                  theme(axis_line=element_line(color="black"), panel_background=element_rect(fill='white')) + \
+                  geom_point() + \
+                  geom_text(aes(label='condition'), hjust='right', vjust='bottom', size=10,
+                            position=position_dodge(width=1)) + \
+                  scale_color_manual(values=("red", "grey")) + \
+                  geom_hline(aes(yintercept=2, ), color="gray", linetype='dotted') + \
+                  geom_vline(aes(xintercept=-1), color="gray", linetype='dotted') + \
+                  geom_vline(aes(xintercept=1), color="gray", linetype='dotted') + \
+                  labs(title=keywords) + xlab("log2FoldChange") + ylab("-1*log10(padj)")
             img.save(keywords, path=get_image_upload_path())
             get_logger().info("%s:火山图保存成功", keywords)
-        re_url = str(self.request.protocol) + '://' + str(self.request.host) + "/api/image/" + str(keywords) + ".png"
+        re_url = str(self.request.headers['Origin'])+ "/api/image/" + str(keywords) + ".png"
+        print("url:",re_url)
         data = {
             "locus_tag": keywords,
             "img_url": re_url
@@ -259,6 +267,7 @@ class PubmedHandler(CustomBasicHandler):
 
 class ColKeyNameHandler(CustomBasicHandler):
     """得到一个集合的键名"""
+
     @login_required
     async def post_process(self, *args, **kwargs):
         col_name = self.data['col_name']  # 得到查询的集合名称
