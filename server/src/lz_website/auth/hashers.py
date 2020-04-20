@@ -9,7 +9,7 @@ from functools import wraps
 import json
 
 from mg_app_framework import MesCode
-import lz_website.util.query_util as query
+#import lz_website.util.query_util as query
 
 
 # 制作新密码
@@ -19,16 +19,16 @@ def make_password(password=None):
     return base64.b64encode(new_md5.hexdigest().encode("utf-8")).decode("utf-8")
 
 
-# 验证密码是否正确
-def is_authenticated(username, password):
-    real_password = query.get_user_password(username)
-    if real_password:
-        if real_password == make_password(password):  # 密码相等
-            return True
-        else:
-            return False
-    else:
-        return False
+# # 验证密码是否正确
+# def is_authenticated(username, password):
+#     real_password = query.get_user_password(username)
+#     if real_password:
+#         if real_password == make_password(password):  # 密码相等
+#             return True
+#         else:
+#             return False
+#     else:
+#         return False
 
 
 # 设置用户cookie

@@ -3,7 +3,7 @@
 
     <q-header elevated class="bg-primary text-white">
       <q-toolbar>
-        <q-btn dense flat round icon="menu" @click="left = !left" />
+<!--        <q-btn dense flat round icon="menu" @click="left = !left"/>-->
 
         <q-toolbar-title>
           <q-avatar>
@@ -14,12 +14,10 @@
       </q-toolbar>
     </q-header>
 
-    <q-drawer show-if-above v-model="left" :width="300" side="left" bordered>
-      <leftList></leftList>
-    </q-drawer>
+    <leftList></leftList>
 
     <q-page-container>
-      <router-view />
+      <router-view/>
     </q-page-container>
 
   </q-layout>
@@ -27,14 +25,15 @@
 
 <script>
   import leftList from "./leftList";
-export default {
-  data () {
-    return {
-      left: false
+
+  export default {
+    data() {
+      return {
+        left: false
+      }
+    },
+    components: {
+      leftList
     }
-  },
-  components: {
-    leftList
   }
-}
 </script>

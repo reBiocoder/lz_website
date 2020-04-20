@@ -2,6 +2,7 @@
   <div>
     <div class="q-pa-md">
       <q-table
+        class="shadow-0"
         :title="code"
         :data="data"
         :columns="columns"
@@ -19,8 +20,8 @@
       </q-table>
     </div>
     <div class="q-pa-md">
-        <q-tab-panel   class="shadow-4">
-          <div class="text-h6">{{`Difference analysis of ${this.$route.params.code}`}}</div>
+        <q-tab-panel   name="picture" class="shadow-0">
+          <div class="text-h6">{{`Volcano plot of ${this.$route.params.code}`}}</div>
             <q-separator />
           <q-img style="width: 80%; height: 80%" :src="img_url"/>
         </q-tab-panel>
@@ -68,7 +69,7 @@
       }
     },
     mounted() {
-      this.code = `Controlled experiment with ${this.$route.params.code}`
+      this.code = `Differential analysis of ${this.$route.params.code}`
       http.search_environment({"q": this.$route.params.code}, (res) => {
         if (res.data.code === "success") {
           if (res.data.data === []) {

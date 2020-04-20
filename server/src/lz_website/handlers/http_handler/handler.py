@@ -16,7 +16,7 @@ from lz_website.util.query_util import (use_locustag_get_result,
                                         random_data, random_column,
                                         get_search_table, get_search_one,
                                         get_environment_result, get_all_keys,
-                                        get_image_json)
+                                        get_image_json,get_menu,add_menu)
 from lz_website.auth.hashers import make_password, set_cookie, login_required
 from lz_website.util.redis_util import (insert_data,
                                         get_data
@@ -199,9 +199,23 @@ class SearchTableHandler(CustomBasicHandler):
 class SearchOneHandler(CustomBasicHandler):
     async def post_process(self, *args, **kwargs):
         """精确搜索结果,基本结果"""
+        data = {}
         keywords = self.data["q"]
         result = await get_search_one('tss', 'utex', keywords)
-        self.send_response_data(MesCode.success, result, info="得到精确搜索结果")
+        for i in result:
+            for k, v in i.items():
+                if k == 'key' and v == 'Start':
+                    data.update({"start": i["value"]})
+                elif k == 'key' and v == 'End':
+                    data.update({"end": i['value']})
+        # 切分列表
+        number = len(result)
+        mid = int(number/2 + 1)
+        print(mid)
+        data1 = result[0: mid]
+        data2 = result[mid:]
+        data.update({"data1": data1, "data2": data2})
+        self.send_response_data(MesCode.success, data, info="得到精确搜索结果")
 
 
 class SearchEnvironmentHandler(CustomBasicHandler):
@@ -273,6 +287,20 @@ class ColKeyNameHandler(CustomBasicHandler):
         col_name = self.data['col_name']  # 得到查询的集合名称
         res_list = await get_all_keys(col_name)
         return self.send_response_data(MesCode.success, {"col_keys": res_list}, info="得到数据成功")
+
+
+# 初始化管理菜单
+class InitMenuHandler(CustomBasicHandler):
+    async def get_process(self, *args, **kwargs):
+        """初始化得到菜单"""
+        ######################## 将组件添加到mongodb中,在这里添加新功能
+        await add_menu("服务器信息", 'dns', 'server')
+        await add_menu("导入CSV表格", 'view_headline', 'csv')
+        await add_menu("管理数据表", 'view_list', 'mg_form')
+        await add_menu("配置JBrowse tracks", 'web', 'mg_jbrowse')
+        ###########################################################
+        result = await get_menu()
+        return self.send_response_data(MesCode.success, {"result": result}, info="得到菜单信息")
 
 
 class WebHandler(CustomBasicHandler):

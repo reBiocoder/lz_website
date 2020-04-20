@@ -115,6 +115,7 @@
     },
     watch: {
       table1(newVal, oldVal) {
+        console.log(newVal,oldVal)
         const spinner = typeof QSpinnerFacebook !== 'undefined'
           ? QSpinnerFacebook // Non-UMD, imported above
           : Quasar.components.QSpinnerFacebook // eslint-disable-line

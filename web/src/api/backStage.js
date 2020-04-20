@@ -1,5 +1,6 @@
 import Vue from 'vue'
 const  $post = Vue.prototype.$post
+const $get = Vue.prototype.$get
 
 export default {
   getLogin(param, cbk){
@@ -11,7 +12,10 @@ export default {
   uploadCsv(param, cbk){
     $post('/api/upload_csv/', param, cbk)
   },
-  getColKeys(param, cbk){
+  getColKeys(param,cbk){
     $post('api/get_col_keys/', param, cbk)
+  },
+  initMenu(cbk){
+    $get('api/init_menu/',cbk)
   }
 }

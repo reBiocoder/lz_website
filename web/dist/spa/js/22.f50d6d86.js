@@ -1,0 +1,1 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([[22],{cb06:function(n,e,t){"use strict";t.r(e);var c=function(){var n=this,e=n.$createElement,t=n._self._c||e;return t("div")},r=[],a={name:"mg_form",data:function(){return{}}},u=a,o=t("2877"),i=Object(o["a"])(u,c,r,!1,null,"8352634c",null);e["default"]=i.exports}}]);

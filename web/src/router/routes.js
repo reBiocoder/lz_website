@@ -22,8 +22,11 @@ const routes = [
     redirect: '/admin/login/',
     component: load('manager/Layout'),
     children: [
-      {path: 'user/', component: load('manager/content'), name: 'administrator',meta: {"needLogin": true,"title": '管理中心'}},
+      {path: 'user/', component: load('manager/content'), name: 'administrator',meta: {"needLogin": true,"title": '后台中心'}},
       {path: 'csv/', component: load('manager/base/csv'), name: 'csv',meta: {"needLogin": true,"title": '上传csv'}},
+      {path: 'mg_form/', component: load('manager/base/mg_form'), name: 'mg_form',meta: {"needLogin": true,"title": '管理表格'}},
+      {path: 'jbrowse/', component: load('manager/base/jbrowse'), name: 'mg_jbrowse',meta: {"needLogin": true,"title": 'jbrowse'}},
+      {path: 'server/', component: load('manager/base/server'), name: 'server',meta: {"needLogin": true,"title": 'server'}},
 
     ]
   },

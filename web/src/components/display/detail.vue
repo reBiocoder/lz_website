@@ -3,8 +3,22 @@
     <div class="q-gutter-y-md">
       <q-tab-panels v-model="panel" animated class="shadow-2 rounded-borders">
         <q-tab-panel name="locus_tag">
-          <div class="text-h5">{{this.$route.params.code}}</div>
-          <q-badge color="purple">Cyanobacteria</q-badge>
+          <div class="text-h5">{{this.code}}</div>
+          <q-badge color="purple">Synechococcus elongatus UTEX2973</q-badge>
+          <div class="messageBlock">
+            <div class="messageBox1">
+              <p v-for="i in this.data1">
+                <span class="messageLabel ng-binding">{{i.key}}:</span>
+                <span class="messageContent ng-binding">{{i.value}}</span>
+              </p>
+            </div>
+            <div class="messageBox2">
+              <p v-for="i in this.data2">
+                <span class="messageLabel ng-binding">{{i.key}}:</span>
+                <span class="messageContent ng-binding">{{i.value}}</span>
+              </p>
+            </div>
+          </div>
         </q-tab-panel>
       </q-tab-panels>
       <q-card>
@@ -17,17 +31,13 @@
           align="justify"
           narrow-indicator
         >
-          <q-tab name="base" label="Base Information"/>
-          <q-tab name="environment" label="Environment"/>
+          <q-tab name="environment" label="GENE EXPRESSION"/>
           <q-tab name="jbrowse" label="JBrowse"/>
         </q-tabs>
 
         <q-separator/>
 
         <q-tab-panels v-model="tab" animated>
-          <q-tab-panel name="base">
-            <base-data></base-data>
-          </q-tab-panel>
 
           <q-tab-panel name="environment">
             <environment></environment>
@@ -44,19 +54,42 @@
 
 <script>
   import http from '../../api/display'
-  import base_data from "./base_component/base"
   import environment from "./base_component/environment";
-  import jbrowse  from "./base_component/jbrowse"
+  import jbrowse from "./base_component/jbrowse"
+  import {mapMutations} from "vuex";
+
   export default {
     name: "detail",
     data() {
       return {
-        tab: 'base',
+        tab: 'environment',
         panel: 'locus_tag',
+        data1: [],
+        data2: [],
+        code: null,
+        name:null,
       }
     },
+    methods: {
+      ...mapMutations(process.env.APP_SCOPE_NAME, ['changeGeneStart', 'changeGeneEnd'])
+    },
+    mounted() {
+      this.code = `Basic Information Of ${this.$route.params.code}`
+      http.search_detail({"q": this.$route.params.code}, (res) => {
+        if (res.data.code === "success") {
+          this.data1 = res.data.data.data1
+          this.data2 = res.data.data.data2
+          this.changeGeneStart(res.data.data.start)
+          this.changeGeneEnd(res.data.data.end)
+        } else {
+          this.$q.notify({
+              message: "Please try again"
+            }
+          )
+        }
+      })
+    },
     components: {
-      "base-data": base_data,
       environment,
       jbrowse
     }
@@ -64,5 +97,42 @@
 </script>
 
 <style scoped>
+  .messageBlock {
+    display: table;
+    width: 100%;
+    margin-top: 5px;
+    padding: 20px;
+    background-color: #ffffff;
+  }
 
+  .messageBlock .messageBox1 {
+    display: table-cell;
+    width: 50%;
+  }
+
+  .messageBlock .messageBox2 {
+    display: table-cell;
+    width: 50%;
+  }
+
+  .messageBlock .messageBox3 {
+    display: table-cell;
+    width: 10%;
+    padding-left: 20px;
+    border-left: 1px solid #ddd;
+  }
+
+  .messageBlock .messageLabel {
+    font-size: 14px;
+    font-weight: 500;
+    margin-right: 10px;
+  }
+
+  .messageBlock .messageImage {
+    width: 20px;
+  }
+
+  .messageTitle {
+    margin: 10px 0;
+  }
 </style>

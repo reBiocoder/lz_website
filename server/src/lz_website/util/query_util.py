@@ -9,8 +9,9 @@ from lz_website.auth.hashers import make_password
 
 import re
 
+
 #  精确搜索api
-async def use_locustag_get_result(locus_tag = None):
+async def use_locustag_get_result(locus_tag=None):
     mongo_client = get_handler(TaskKey.mongodb_async)
     db = mongo_client['lz_database']
     tss_col = db['tss']
@@ -134,7 +135,7 @@ def get_all_padj_and_log2FoldChange_keys(keys_list: list, identify: str, split: 
     return result
 
 
-async def get_environment_result(locus_tag: str, raw_col:str = 'gen_exp') -> list:
+async def get_environment_result(locus_tag: str, raw_col: str = 'gen_exp') -> list:
     """这里用的标记是locus_tags"""
     # import motor
     # mongo_client = motor.MotorClient()
@@ -186,7 +187,8 @@ async def create_padj_and_log2_collection(raw_col: str = None):
                             "log2": i.get(k, '')
                         })
                         #  log2与padj全部插入完成,处理其中的问题数据,默认为0
-                        padj_log2_result["threshold"] = get_threshold(padj_log2_result['log2'], padj_log2_result['padj'])
+                        padj_log2_result["threshold"] = get_threshold(padj_log2_result['log2'],
+                                                                      padj_log2_result['padj'])
                         break
                     # else:
                     #     padj_log2_result.update({"log2": 0, "threshold": False})
@@ -296,7 +298,7 @@ async def get_search_table(first_col, second_col, keyword,
     if keyword:
         query = ".*" + str(keyword) + ".*"  # 忽略大小写,查询包括关键字的结果
         query = re.compile(query, re.IGNORECASE)
-        #mongo_client = motor.MotorClient()
+        # mongo_client = motor.MotorClient()
         mongo_client = get_handler(TaskKey.mongodb_async)
         db = mongo_client["lz_database"]
         new_col = first_col + '_' + second_col  # 新增集合名称
@@ -314,7 +316,7 @@ async def get_search_table(first_col, second_col, keyword,
 
 async def get_search_one(first_col, second_col, keyword,
                          locus_tag: str = "Locus_tag",
-                        ):
+                         ):
     """得到精确搜索结果"""
     # import motor
     # mongo_client = motor.MotorClient()
@@ -357,8 +359,38 @@ async def get_user_password(username=None):
         return None
 
 
+# 在菜单中添加数据
+async def add_menu(component_name: str,icon: str, code: str):
+    """菜单存储collection为mg_menu_info"""
+    # import motor
+    # mongo_client = motor.MotorClient()
+    mongo_client = get_handler(TaskKey.mongodb_async)
+    db = mongo_client["lz_database"]
+    col = db["mg_menu_info"]
+    # 插入一条数据
+    res = await col.update_one({"text": component_name, "icon": icon, 'code': code},
+                               {"$set": {"text": component_name, "icon": icon, 'code': code}},
+                               upsert=True)
+    if res.acknowledged:
+        return True
+    else:
+        return False
+
+
+# 查询菜单中的所有数据
+async def get_menu():
+    result = []
+    mongo_client = get_handler(TaskKey.mongodb_async)
+    db = mongo_client["lz_database"]
+    col = db["mg_menu_info"]
+    async for i in col.find({}):
+        del i["_id"]  # 删除主键
+        result.append(i)
+    return result
+
+
 # 查询基础信息
 if __name__ == '__main__':
     import asyncio
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(get_environment_result('M744_RS06815'))
+    loop.run_until_complete(add_menu("导入CSV数据"))
