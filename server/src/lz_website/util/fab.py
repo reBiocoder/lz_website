@@ -22,10 +22,12 @@
 #
 # scp.put('1.txt', '/home/root')
 
-print("(a,(b,None,N),(c,d))" in "(a,b,(c,d))")
-
-
-
+# print("(a,(b,None,N),(c,d))" in "(a,b,(c,d))")
+# stack = [1,2,3,4]
+# print(stack.pop())
+#
+for i in [] or [None]:
+    print(i)
 
 
 
