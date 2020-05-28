@@ -28,3 +28,9 @@ export const changeGeneEnd = (state, data) => {
     state.gene_end = data
   }
 }
+
+export const changeClickTitle = (state, data) => {
+  if(data){
+    state.click_title = data
+  }
+}

@@ -42,12 +42,20 @@ import qboot_Bootaxios from 'boot/axios'
 
 import qboot_Bootnotify_defaults from 'boot/notify_defaults'
 
+import qboot_Bootuse_echart from 'boot/use_echart'
 
 
 
 
 
 
+
+Vue.config.devtools = true
+Vue.config.productionTip = false
+
+
+
+console.info('[Quasar] Running SPA.')
 
 
 
@@ -66,7 +74,7 @@ async function start () {
   }
 
   const urlPath = window.location.href.replace(window.location.origin, '')
-  const bootFiles = [qboot_Booti18n,qboot_Bootaxios,qboot_Bootnotify_defaults]
+  const bootFiles = [qboot_Booti18n,qboot_Bootaxios,qboot_Bootnotify_defaults,qboot_Bootuse_echart]
 
   for (let i = 0; routeUnchanged === true && i < bootFiles.length; i++) {
     if (typeof bootFiles[i] !== 'function') {

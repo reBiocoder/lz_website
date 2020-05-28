@@ -1,5 +1,13 @@
 from os.path import dirname, realpath, basename, join
-from mg_app_framework import AppConfigBasic, AppType
+from mg_app_framework import AppConfigBasic, AppType, InitFuncBasic, get_logger
+
+from lz_website.util.query_util import create_collection_and_index
+
+
+class InitFunc(InitFuncBasic):
+    async def init_func(self):
+        get_logger().info("初始化任务创建索引成功")
+        await create_collection_and_index(collection_name="access_date", indexs=[("date", 1)])
 
 
 class ConfigStore(AppConfigBasic):

@@ -1,20 +1,23 @@
 <template>
-  <q-layout view="lhh lpr fff">
+  <q-layout view="lHh lpR fFf">
 
     <q-header elevated class="bg-primary text-white">
       <q-toolbar>
-<!--        <q-btn dense flat round icon="menu" @click="left = !left"/>-->
+        <q-btn dense flat round icon="menu" @click="left = !left"/>
 
         <q-toolbar-title>
           <q-avatar>
             <img src="https://cdn.quasar.dev/logo/svg/quasar-logo.svg">
           </q-avatar>
-          主菜单
+          {{ this.click_title }}
         </q-toolbar-title>
       </q-toolbar>
     </q-header>
 
-    <leftList></leftList>
+    <q-drawer v-model="left" side="left" content-class="bg-blue-grey-2" :width="230">
+      <!-- drawer content -->
+      <mgAside></mgAside>
+    </q-drawer>
 
     <q-page-container>
       <router-view/>
@@ -24,16 +27,20 @@
 </template>
 
 <script>
-  import leftList from "./leftList";
+  import mgAside from "components/manager/mgAside";
+  import {mapState} from 'vuex';
 
   export default {
     data() {
       return {
-        left: false
+        left: true
       }
     },
+    computed: {
+      ...mapState(process.env.APP_SCOPE_NAME, ['click_title']),
+    },
     components: {
-      leftList
-    }
+      mgAside
+    },
   }
 </script>

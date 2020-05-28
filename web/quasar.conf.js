@@ -27,6 +27,7 @@ module.exports = function (ctx) {
       'i18n',
       'axios',
       'notify_defaults',
+      'use_echart',
     ],
 
     // https://quasar.dev/quasar-cli/quasar-conf-js#Property%3A-css
@@ -79,6 +80,7 @@ module.exports = function (ctx) {
         'QSkeleton',
         'QUploader',
         'QRadio',
+        'QExpansionItem'
       ],
       directives: [],
       config: {

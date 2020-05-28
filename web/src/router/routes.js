@@ -5,29 +5,19 @@ function load(component) {
 const routes = [
   {
     path: '/',
-    redirect: '/lz/'
+    redirect: '/admin/'
   },
   //------后台管理路由-------
   {
     path: '/admin/',
-    component: load('manager/login_register'),
-    redirect: '/admin/login/',
+    redirect: '/admin/home',
+    component: load('manager/layout'),
     children: [
-      {path: "login/", component: load('manager/login'), name: 'login',meta: {"title": "登录"}},
-      {path: "register/", component: load('manager/register'), name: 'register', meta: {"title": "注册"}}
-    ]
-  },
-  {
-    path: '/manager/',
-    redirect: '/admin/login/',
-    component: load('manager/Layout'),
-    children: [
-      {path: 'user/', component: load('manager/content'), name: 'administrator',meta: {"needLogin": true,"title": '后台中心'}},
-      {path: 'csv/', component: load('manager/base/csv'), name: 'csv',meta: {"needLogin": true,"title": '上传csv'}},
-      {path: 'mg_form/', component: load('manager/base/mg_form'), name: 'mg_form',meta: {"needLogin": true,"title": '管理表格'}},
-      {path: 'jbrowse/', component: load('manager/base/jbrowse'), name: 'mg_jbrowse',meta: {"needLogin": true,"title": 'jbrowse'}},
-      {path: 'server/', component: load('manager/base/server'), name: 'server',meta: {"needLogin": true,"title": 'server'}},
-
+      {path: 'home', component: load('manager/base/home'), name: 'manager_home', meta: {title: '后台管理首页'}},
+      {path: 'serverinfo', component: load('manager/base/serverinfo'), name: 'manager_serverInfo', meta: {title: '服务器信息'}},
+      {path: 'base_data', component: load('manager/base/baseData'), name: 'manager_baseData', meta: {title: '基础数据'}},
+      {path: 'difference', component: load('manager/base/difference'), name: 'manager_difference_analysis', meta: {title: '差异分析'}},
+      {path: 'jbrowse', component: load('manager/base/jbrowse'), name: 'manager_jbrowse', meta: {title: 'jbrowse配置'}}
     ]
   },
   //----前端用户页面路由------

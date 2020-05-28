@@ -4,7 +4,7 @@
 
 <script>
     export default {
-        name: "contentid"
+        name: "serverinfo"
     }
 </script>
 

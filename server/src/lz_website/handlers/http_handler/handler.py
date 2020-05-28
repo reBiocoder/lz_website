@@ -3,6 +3,8 @@ from plotnine import *
 import pandas as pd
 import numpy as np
 import os
+import datetime
+
 from mg_app_framework import (HttpBasicHandler, MesCode, get_context, get_logger,
                               )
 from mg_app_framework.config import Store
@@ -16,7 +18,9 @@ from lz_website.util.query_util import (use_locustag_get_result,
                                         random_data, random_column,
                                         get_search_table, get_search_one,
                                         get_environment_result, get_all_keys,
-                                        get_image_json,get_menu,add_menu)
+                                        get_image_json,get_menu,add_menu,
+                                        update_date_access, get_date_access
+                                        )
 from lz_website.auth.hashers import make_password, set_cookie, login_required
 from lz_website.util.redis_util import (insert_data,
                                         get_data
@@ -54,9 +58,12 @@ class CustomBasicHandler(HttpBasicHandler):
     :type自定义handler
     """
 
-    def prepare(self):
+    async def prepare(self):
+        i = datetime.datetime.now()
+        current_date = "{}-{}".format(i.month, i.day)
+        get_logger().info("当前访问日期为为：%s", current_date)
+        await update_date_access(current_date)
         self.application.settings["cookie_secret"] = "12345"
-        print(self.current_user)
 
     def get_current_user(self):
         user_cookie = self.get_secure_cookie("session_id")  # {"username": "周鹏"}
@@ -301,6 +308,13 @@ class InitMenuHandler(CustomBasicHandler):
         ###########################################################
         result = await get_menu()
         return self.send_response_data(MesCode.success, {"result": result}, info="得到菜单信息")
+
+
+# 统计近七天的访问情况
+class GetOneWeekAccess(CustomBasicHandler):
+    async def get_process(self, *args, **kwargs):
+        res = await get_date_access()
+        return self.send_response_data(MesCode.success, res, info="得到访问量信息")
 
 
 class WebHandler(CustomBasicHandler):

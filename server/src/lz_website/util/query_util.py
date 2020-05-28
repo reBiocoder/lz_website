@@ -8,6 +8,7 @@ from mg_app_framework import (get_handler, get_store,
 from lz_website.auth.hashers import make_password
 
 import re
+import datetime
 
 
 #  精确搜索api
@@ -360,7 +361,7 @@ async def get_user_password(username=None):
 
 
 # 在菜单中添加数据
-async def add_menu(component_name: str,icon: str, code: str):
+async def add_menu(component_name: str, icon: str, code: str):
     """菜单存储collection为mg_menu_info"""
     # import motor
     # mongo_client = motor.MotorClient()
@@ -389,8 +390,70 @@ async def get_menu():
     return result
 
 
+async def create_collection_and_index(collection_name: str, indexs: list) -> None:
+    """
+    创建一个集合，并创建索引
+    collection_name: 集合名称
+    indexs： 索引名称 [("code", 1), ("item", 1)]
+    """
+    handle = get_handler(TaskKey.mongodb_async)
+    db = handle["lz_database"]
+    collection_names = await db.list_collection_names(False)
+    if collection_name not in collection_names:
+        collection_current = await db.create_collection(collection_name)
+        for index in indexs:
+            await collection_current.create_index([index])
+            get_logger().info("创建集合【%s】和索引【%s】成功", collection_current, index)
+
+
+async def get_collection_handle(database_name: str = "lz_database", collection_name: str = ''):
+    """
+    得到集合处理对象
+    """
+    handle = get_handler(TaskKey.mongodb_async)
+    return handle[database_name].get_collection(collection_name)
+
+
+async def update_date_access(date: str) -> None:
+    """
+    更新数据库中，date日的访问次数
+    """
+    handle = await get_collection_handle(collection_name='access_date')
+    await handle.update_one({"date": date}, {"$inc": {"access_num": 1}}, upsert=True)
+
+
+async def get_date_access():
+    """
+    得到最近一周的访问量,
+    """
+    i = datetime.datetime.now()
+    month = i.month
+    date = i.day
+    x_data = ["{}-{}".format(month, date - x) for x in range(6, -1, -1)]  # 得到横坐标
+    handle = await get_collection_handle(collection_name="access_date")
+    series_data = []
+    week_datas = {}  # 一周访问量字典， 考虑后期可以扩展功能
+    week_data = []
+    for each_data in x_data:
+        res = await handle.find_one({"date": each_data})
+        if res:
+            week_data.append(str(res["access_num"]))  # 每天的访问数量
+        else:
+            week_data.append("0")
+    week_datas.update({"name": '最近一周接口访问量',
+                       "type": 'line',
+                       "stack": '总量',
+                       "areaStyle": {},
+                       "data": week_data})
+    series_data.append(week_datas)
+
+    res_data = {"x_data": x_data, "series_data": series_data}
+    return res_data
+
+
 # 查询基础信息
 if __name__ == '__main__':
     import asyncio
+
     loop = asyncio.get_event_loop()
     loop.run_until_complete(add_menu("导入CSV数据"))
