@@ -3,6 +3,7 @@
     <q-item :focused="false" :active="false" :clickable="false" :manual-focus="false">
       <q-item-section class="text-center">蓝藻数据库后台管理系统</q-item-section>
     </q-item>
+    <q-separator/>
 
     <q-list v-for="(value, key, index) in asideList" class="rounded-borders" :key="index">
 

@@ -5,8 +5,7 @@ from lz_website.handlers.http_handler.handler import (WebHandler,
                                                       IndexColHandler, SearchTableHandler,
                                                       SearchOneHandler, SearchEnvironmentHandler,
                                                       EnvironmentImageHandler, PubmedHandler,
-                                                      ColKeyNameHandler,InitMenuHandler,
-                                                        GetOneWeekAccess
+                                                      ColKeyNameHandler, GetOneWeekAccess
                                                       )
 
 from .handler import get_image_upload_path
@@ -24,7 +23,6 @@ url = [
     (r'/api/get_image/', EnvironmentImageHandler),
     (r'/api/pubmed/', PubmedHandler),
     (r'/api/get_col_keys/', ColKeyNameHandler),
-    (r'/api/init_menu/', InitMenuHandler),
     (r'/api/get_access/', GetOneWeekAccess),
     # 图片静态文件处理
     (r'/api/image/(.*)', StaticFileBasicHandler, {"path": get_image_upload_path()})

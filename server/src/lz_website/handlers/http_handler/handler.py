@@ -296,20 +296,6 @@ class ColKeyNameHandler(CustomBasicHandler):
         return self.send_response_data(MesCode.success, {"col_keys": res_list}, info="得到数据成功")
 
 
-# 初始化管理菜单
-class InitMenuHandler(CustomBasicHandler):
-    async def get_process(self, *args, **kwargs):
-        """初始化得到菜单"""
-        ######################## 将组件添加到mongodb中,在这里添加新功能
-        await add_menu("服务器信息", 'dns', 'server')
-        await add_menu("导入CSV表格", 'view_headline', 'csv')
-        await add_menu("管理数据表", 'view_list', 'mg_form')
-        await add_menu("配置JBrowse tracks", 'web', 'mg_jbrowse')
-        ###########################################################
-        result = await get_menu()
-        return self.send_response_data(MesCode.success, {"result": result}, info="得到菜单信息")
-
-
 # 统计近七天的访问情况
 class GetOneWeekAccess(CustomBasicHandler):
     async def get_process(self, *args, **kwargs):

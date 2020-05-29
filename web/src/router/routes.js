@@ -13,11 +13,39 @@ const routes = [
     redirect: '/admin/home',
     component: load('manager/layout'),
     children: [
-      {path: 'home', component: load('manager/base/home'), name: 'manager_home', meta: {title: '后台管理首页'}},
-      {path: 'serverinfo', component: load('manager/base/serverinfo'), name: 'manager_serverInfo', meta: {title: '服务器信息'}},
+      // 基础数据配置相关路由
       {path: 'base_data', component: load('manager/base/baseData'), name: 'manager_baseData', meta: {title: '基础数据'}},
-      {path: 'difference', component: load('manager/base/difference'), name: 'manager_difference_analysis', meta: {title: '差异分析'}},
-      {path: 'jbrowse', component: load('manager/base/jbrowse'), name: 'manager_jbrowse', meta: {title: 'jbrowse配置'}}
+      {
+        path: 'base_data_change/:code',
+        component: load('manager/base/baseDataChange'),
+        name: 'manager_baseDataChange',
+        meta: {title: '修改基础数据'}
+      },
+      //后台首页配置
+      {path: 'home', component: load('manager/base/home'), name: 'manager_home', meta: {title: '后台管理首页'}},
+      //服务器信息配置
+      {
+        path: 'serverinfo',
+        component: load('manager/base/serverinfo'),
+        name: 'manager_serverInfo',
+        meta: {title: '服务器信息'}
+      },
+      //差异分析配置
+      {
+        path: 'difference',
+        component: load('manager/base/difference'),
+        name: 'manager_difference_analysis',
+        meta: {title: '差异分析'}
+      },
+      //JBrowse tracks配置
+      {path: 'jbrowse', component: load('manager/base/jbrowse'), name: 'manager_jbrowse', meta: {title: 'jbrowse配置'}},
+      {
+        path: 'import_data',
+        component: load('manager/base/importExcel'),
+        name: 'manager_importExcel',
+        meta: {title: '导入数据'}
+      },
+
     ]
   },
   //----前端用户页面路由------

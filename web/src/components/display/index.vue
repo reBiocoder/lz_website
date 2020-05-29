@@ -11,7 +11,7 @@
       <template v-slot:body-cell-Locus_tags="props">
         <q-td :props="props">
           <div>
-            <router-link :to="{name: 'detail', params: {code: props.row.Locus_tags}}">
+            <router-link  style="text-decoration: none;" :to="{name: 'detail', params: {code: props.row.Locus_tags}}">
               {{props.row.Locus_tags}}
             </router-link>
           </div>

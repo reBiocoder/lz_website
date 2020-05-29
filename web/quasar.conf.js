@@ -80,7 +80,8 @@ module.exports = function (ctx) {
         'QSkeleton',
         'QUploader',
         'QRadio',
-        'QExpansionItem'
+        'QExpansionItem',
+        'QInput'
       ],
       directives: [],
       config: {

@@ -15,9 +15,6 @@ export default {
   getColKeys(param,cbk){
     $post('api/get_col_keys/', param, cbk)
   },
-  initMenu(cbk) {
-    $get('api/init_menu/', cbk)
-  },
   get_access(cbk){
     $get("api/get_access/", cbk)
   }

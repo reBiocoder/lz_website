@@ -20,6 +20,12 @@ export const asideList = {
         level: 0,
         caption: '',
         icon: 'dns'
+      },
+      'manager_importExcel': {
+        name: "导入数据",
+        level: 0,
+        caption: '',
+        icon: 'cloud_download'
       }
     }
   },

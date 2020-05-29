@@ -1,12 +1,10 @@
 <template>
-<div>
-  123
-</div>
+
 </template>
 
 <script>
     export default {
-        name: "serverinfo"
+        name: "importExcel"
     }
 </script>
 
