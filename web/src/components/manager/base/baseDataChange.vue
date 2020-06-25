@@ -12,40 +12,54 @@
         </div>
         <q-separator/>
         <!--修改表单---------------->
-        <q-form
-          @submit="onSubmit"
-          @reset="onReset"
-          class="q-gutter-md q-pt-md"
-        >
-          <q-input
-            filled
-            v-model="name"
-            label="Your name *"
-            hint="Name and surname"
-            lazy-rules
-            :rules="[ val => val && val.length > 0 || 'Please type something']"
-          />
+        <div class="row">
+          <q-form
+            @submit="onSubmit"
+            @reset="onReset"
+            class="q-gutter-md q-pt-md col-8"
+          >
+            <div class="row" :key="i" v-for="(each_data, i) in this.data">
+              <div class="col-2">{{each_data.key}}</div>
+              <q-input v-if="each_data.const_key == 'locus_tags'" disable :ref="each_data.const_key" class="col-10"
+                       outlined v-model="each_data.value"
+                       :name="each_data.key" type="text" :dense="true">
+              </q-input>
+              <q-input v-else :ref="each_data.const_key" class="col-10" outlined v-model="each_data.value"
+                       :name="each_data.key" type="text" :dense="true">
+              </q-input>
+            </div>
+            <div>
+              <q-btn label="确认修改" type="submit" color="primary"/>
+              <q-btn label="删除数据" type="reset" color="deep-orange" class="q-ml-sm"/>
+            </div>
+          </q-form>
+          <div class="col-4">
+            <div class="q-px-lg q-pb-md">
+              <q-timeline  >
+                <q-timeline-entry heading tag="h7">
+                  历史记录
+                </q-timeline-entry>
 
-          <q-input
-            filled
-            type="number"
-            v-model="age"
-            label="Your age *"
-            lazy-rules
-            :rules="[
-          val => val !== null && val !== '' || 'Please type your age',
-          val => val > 0 && val < 100 || 'Please type a real age'
-        ]"
-          />
+                <q-timeline-entry
+                  title="Event Title"
+                  subtitle="February 22, 1986"
+                  body="123"
+                >
+                </q-timeline-entry>
 
-          <q-toggle v-model="accept" label="I accept the license and terms"/>
+                <q-timeline-entry
+                  title="Event Title"
+                  subtitle="February 21, 1986"
+                  icon="delete"
+                  body="456"
+                >
+                </q-timeline-entry>
 
-          <div>
-            <q-btn label="Submit" type="submit" color="primary"/>
-            <q-btn label="Reset" type="reset" color="primary" flat class="q-ml-sm"/>
+              </q-timeline>
+            </div>
+
           </div>
-        </q-form>
-
+        </div>
 
       </q-tab-panel>
     </q-card>
@@ -53,17 +67,50 @@
 </template>
 
 <script>
+  import http from '../../../api/display'
+  import back_http from '../../../api/backStage'
+
   export default {
     name: "baseDataChange",
     data() {
       return {
-        name: null,
-        age: null,
-
-        accept: false
+        data: null,
       }
     },
+    methods: {
+      onSubmit() { //确认提交数据
+        console.log(this.$refs)
+        let res = {}
+        let document = {}
+        for (let i in this.$refs) {
+          if (i === 'locus_tags') {
+            res["primary_key"] = this.$refs[i][0].value
+            document[this.$refs[i][0].name] = this.$refs[i][0].value
+          } else {
+            document[this.$refs[i][0].name] = this.$refs[i][0].value
+          }
+        }
+        res["document"] = document
+        back_http.update_utex_tss_data(res, (resu) => {
+          console.log(resu)
+        })
+      },
+      onReset() {
 
+      }
+    },
+    mounted() {
+      http.search_detail({"q": this.$route.params.code, 'mg_type': 'manager'}, (res) => {
+        if (res.data.code === "success") {
+          this.data = res.data.data
+        } else {
+          this.$q.notify({
+              message: "Please try again"
+            }
+          )
+        }
+      })
+    }
   }
 </script>
 

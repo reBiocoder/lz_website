@@ -1,13 +1,17 @@
 from os.path import dirname, realpath, basename, join
 from mg_app_framework import AppConfigBasic, AppType, InitFuncBasic, get_logger
 
-from lz_website.util.query_util import create_collection_and_index
+from lz_website.util.query_util import create_collection_and_index, get_all_collection_names
 
 
 class InitFunc(InitFuncBasic):
     async def init_func(self):
-        get_logger().info("初始化任务创建索引成功")
-        await create_collection_and_index(collection_name="access_date", indexs=[("date", 1)])
+        if "access_date" not in await get_all_collection_names():
+            get_logger().info("创建访问日志数据库成功")
+            await create_collection_and_index(collection_name="access_date", indexs=[("date", 1)])
+        if "cyano_genomes" not in await get_all_collection_names():
+            get_logger().info("创建cyano_genomes数据库成功")
+            await create_collection_and_index(collection_name="cyano_genomes", indexs=[("tax_id", 1)])
 
 
 class ConfigStore(AppConfigBasic):

@@ -7,12 +7,13 @@
       row-key="Locus_tags"
       :separator="separator"
       :pagination.sync="pagination"
+      :rows-per-page-options="[50, 100, 200, 500, 0]"
     >
-      <template v-slot:body-cell-Locus_tags="props">
+      <template v-slot:body-cell-Species="props">
         <q-td :props="props">
           <div>
-            <router-link  style="text-decoration: none;" :to="{name: 'detail', params: {code: props.row.Locus_tags}}">
-              {{props.row.Locus_tags}}
+            <router-link style="text-decoration: none;" :to="{name: 'detail', params: {code: props.row.Species}}">
+              {{props.row.Species}}
             </router-link>
           </div>
         </q-td>
@@ -30,7 +31,7 @@
       return {
         pagination: {
           page: 1, //初始页面在1页
-          rowsPerPage: 10 // 0 means all rows
+          rowsPerPage: 50 // 0 means all rows
         },
         separator: 'cell',
         columns: [],
@@ -39,16 +40,28 @@
     },
     method: {},
     mounted: function () {
-      http.index_random_col((res) => {
-        if (res.data.code === "success") {
-          this.columns = res.data.data
+      http.get_cyano_genomes((res) => {
+          if (res.data.code === "success") {
+            let header = res.data.data.header
+            let raw_header = []
+            for (let i = 0, len = header.length; i < len; ++i) {
+              raw_header.push({
+                "name": header[i],
+                "label": header[i],
+                "align": "center",
+                "field": header[i],
+                "sortable": true
+              })
+            }
+            this.columns = raw_header
+            this.data = res.data.data.data
+          } else {
+            this.$q.notify({
+              message: res.data.info
+            })
+          }
         }
-      })
-      http.index_random_data((res) => {
-        if (res.data.code === 'success') {
-          this.data = res.data.data
-        }
-      })
+      )
     }
   }
 </script>

@@ -96,6 +96,7 @@
           //{icon: 'whatshot', text: 'Trending', code:"trending"}, //趋势
         ],
         links2: [
+          {icon: 'description', text: 'Hot', code: "hot"},
           {icon: 'web', text: 'JBrowse', code: "jbrowse"},
           {icon: 'description', text: 'PubMed', code: "pubmed"},
         ]

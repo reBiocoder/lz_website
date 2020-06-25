@@ -81,7 +81,10 @@ module.exports = function (ctx) {
         'QUploader',
         'QRadio',
         'QExpansionItem',
-        'QInput'
+        'QInput',
+        'QTimeline',
+        'QTimelineEntry',
+        'QSelect',
       ],
       directives: [],
       config: {

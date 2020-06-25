@@ -110,12 +110,11 @@ async def get_all_keys(raw_col=None) -> list:
     lz_db = mongo_client["lz_database"]
     raw_col = lz_db[raw_col]
     keys_list = []
-    async for i in raw_col.find().limit(1):
+    async for i in raw_col.find({}).limit(1):
         for name in i.keys():
-            if name == '_id':
-                pass
-            else:
-                keys_list.append(name)
+            keys_list.append(name)
+    if '_id' in keys_list:
+        keys_list.remove('_id')  # 删除_id
     return keys_list
 
 
@@ -451,7 +450,63 @@ async def get_date_access():
     return res_data
 
 
-# 查询基础信息
+async def update_utex_tss_one_data(primary_key, document):
+    """
+    更新utex_tss的一条数据
+    """
+    handle = await get_collection_handle(collection_name="tss_utex")
+    res = await handle.update_one({'Locus_tags': primary_key}, {"$set": document})
+    get_logger().info("更新数据表tss_utex成功%s", res.modified_count)
+    return res.raw_result
+
+
+async def get_all_collection_names():
+    """
+    得到所有的集合名
+    """
+    handle = get_handler(TaskKey.mongodb_async)['lz_database']
+    lists = await handle.list_collection_names()
+    return lists
+
+
+async def insert_many_data(collection_name: str, data: list):
+    """
+    在集合中插入多条数据
+    """
+    handle = await get_collection_handle(collection_name=collection_name)
+    res = await handle.insert_many(data)
+    return res
+
+
+async def get_many_data(collection_name: str):
+    """
+    得到集合中的所有文档
+    """
+    handle = await get_collection_handle(collection_name=collection_name)
+    res = []
+    async for doc in handle.find({}):
+        del doc["_id"]
+        res.append(doc)
+    return res
+
+
+async def insert_logging_data(document: dict):
+    """
+    document的格式：
+    {
+    "collection_name": 集合名称, str
+    "field": 被操作的列名, str
+    "old_value": 旧数据, {}
+    "new_value": 新数据, {}
+    "user": "操作人账号", str
+    "username": 操作人姓名 str
+    "create_time": 操作时间, str
+    "remark": 备注 str
+    }
+    """
+    pass
+
+
 if __name__ == '__main__':
     import asyncio
 

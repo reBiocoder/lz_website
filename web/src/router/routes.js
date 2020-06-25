@@ -72,6 +72,7 @@ const routes = [
       {path: 'pubmed', component: load('display/pubmed'), name: 'pubmed', meta: {title: 'PubMed'}},
       {path: 'jbrowse', component: load('display/jbrowse'), name: 'jbrowse', meta: {title: 'JBrowse'}},
       {path: 'trending', component: load('display/trending'), name: 'trending'},
+      {path: 'hot', component: load('display/hot'), name: 'hot'},
 
 
     ]

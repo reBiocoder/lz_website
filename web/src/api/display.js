@@ -23,5 +23,8 @@ export default {
   },
   pubmed(param, cbk){
     $post('/api/pubmed/', param, cbk)
-  }
+  },
+  get_cyano_genomes(cbk){
+    $get('/api/cyano_genomes/',cbk)
+  },
 }

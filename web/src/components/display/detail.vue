@@ -33,6 +33,11 @@
         >
           <q-tab name="environment" label="GENE EXPRESSION"/>
           <q-tab name="jbrowse" label="JBrowse"/>
+          <q-tab name="references" label="references"/>
+          <q-tab name="sequences" label="sequences"/>
+          <q-tab name="homologs" label="homologs"/>
+          <q-tab name="mutants" label="mutants"/>
+
         </q-tabs>
 
         <q-separator/>
@@ -46,6 +51,22 @@
           <q-tab-panel name="jbrowse">
             <jbrowse></jbrowse>
           </q-tab-panel>
+
+          <q-tab-panel name="references">
+            <references></references>
+          </q-tab-panel>
+
+          <q-tab-panel name="sequences">
+            <sequences></sequences>
+          </q-tab-panel>
+
+          <q-tab-panel name="homologs">
+            <homologs></homologs>
+          </q-tab-panel>
+
+          <q-tab-panel name="mutants">
+            <mutants></mutants>
+          </q-tab-panel>
         </q-tab-panels>
       </q-card>
     </div>
@@ -56,6 +77,11 @@
   import http from '../../api/display'
   import environment from "./base_component/environment";
   import jbrowse from "./base_component/jbrowse"
+  import references from "components/display/base_component/references";
+  import sequences from "components/display/base_component/sequences";
+  import homologs from "components/display/base_component/homologs";
+  import mutants from "components/display/base_component/mutants";
+
   import {mapMutations} from "vuex";
 
   export default {
@@ -67,7 +93,7 @@
         data1: [],
         data2: [],
         code: null,
-        name:null,
+        name: null,
       }
     },
     methods: {
@@ -75,7 +101,7 @@
     },
     mounted() {
       this.code = `Basic Information Of ${this.$route.params.code}`
-      http.search_detail({"q": this.$route.params.code}, (res) => {
+      http.search_detail({"q": this.$route.params.code, 'mg_type': 'display'}, (res) => {
         if (res.data.code === "success") {
           this.data1 = res.data.data.data1
           this.data2 = res.data.data.data2
@@ -90,8 +116,7 @@
       })
     },
     components: {
-      environment,
-      jbrowse
+      environment,jbrowse,references,sequences,homologs,mutants
     }
   }
 </script>

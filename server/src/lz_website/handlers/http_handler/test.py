@@ -1,6 +1,6 @@
-import datetime
-import time
-i = datetime.datetime.now()
+a = [1, 2,3]
 
-for x in range(6, -1, -1):
-    print(x)
+if a[3]:
+    print("ok")
+else:
+    print("123")

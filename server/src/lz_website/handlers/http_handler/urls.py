@@ -1,11 +1,12 @@
 from mg_app_framework.web import StaticFileBasicHandler
-from lz_website.handlers.http_handler.handler import (WebHandler,
+from lz_website.handlers.http_handler.handler import (WebHandler, CyanoGenomesHandler,
                                                       UploadFileHandler, LoginHandler,
                                                       RegisterHandler, IndexHandler,
                                                       IndexColHandler, SearchTableHandler,
                                                       SearchOneHandler, SearchEnvironmentHandler,
                                                       EnvironmentImageHandler, PubmedHandler,
-                                                      ColKeyNameHandler, GetOneWeekAccess
+                                                      ColKeyNameHandler, GetOneWeekAccess,
+                                                      UpdateUtexTssOneData, ImportExcelHandler,
                                                       )
 
 from .handler import get_image_upload_path
@@ -24,6 +25,9 @@ url = [
     (r'/api/pubmed/', PubmedHandler),
     (r'/api/get_col_keys/', ColKeyNameHandler),
     (r'/api/get_access/', GetOneWeekAccess),
+    (r'/api/update_tss_utex/', UpdateUtexTssOneData),
+    (r'/api/import_excel/', ImportExcelHandler),
+    (r'/api/cyano_genomes/', CyanoGenomesHandler),
     # 图片静态文件处理
     (r'/api/image/(.*)', StaticFileBasicHandler, {"path": get_image_upload_path()})
 ]

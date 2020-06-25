@@ -55,7 +55,6 @@ function _delete(url, succ, fail, config = {}) {
 function _post(url, param, succ, fail, config = {}) {
   http.post(url, param, config)
     .then(function (response) {
-      console.log(response)
       typeof succ === 'function' && succ(response)
     })
     .catch(function (error) {

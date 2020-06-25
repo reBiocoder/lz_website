@@ -11,21 +11,24 @@ from mg_app_framework.config import Store
 
 from lz_website.config import ConfigStore
 from lz_website.util import NCBI
-from lz_website.util.query_util import (use_locustag_get_result,
-                                        validate_user_info,
+from lz_website.util.query_util import (use_locustag_get_result, insert_many_data,
+                                        validate_user_info, get_many_data,
                                         register_user_info,
                                         create_padj_and_log2_collection,
                                         random_data, random_column,
                                         get_search_table, get_search_one,
                                         get_environment_result, get_all_keys,
-                                        get_image_json,get_menu,add_menu,
-                                        update_date_access, get_date_access
+                                        get_image_json, get_menu, add_menu,
+                                        update_date_access, get_date_access,
+                                        update_utex_tss_one_data
                                         )
 from lz_website.auth.hashers import make_password, set_cookie, login_required
 from lz_website.util.redis_util import (insert_data,
                                         get_data
                                         )
 from lz_website.auth.hashers import (login_required)
+from lz_website.util.const_values import BASE_DATA_KEY
+
 import json
 import uuid
 
@@ -169,7 +172,10 @@ class RegisterHandler(CustomBasicHandler):
 
 
 class IndexHandler(CustomBasicHandler):
-    """主页展示表格中的数据"""
+    """
+    主页展示表格中的数据
+    2020/6/25日更新：该接口已转至后台管理使用
+    """
 
     async def get_process(self, *args, **kwargs):
         data = await random_data('tss', 'utex')
@@ -183,7 +189,10 @@ class IndexHandler(CustomBasicHandler):
 
 
 class IndexColHandler(CustomBasicHandler):
-    """主页表格中的列名"""
+    """
+    主页表格中的列名
+    2020/6/25日更新：该接口已转至后台管理使用
+    """
 
     async def get_process(self, *args, **kwargs):
         data = await random_column('tss', 'utex')
@@ -205,24 +214,33 @@ class SearchTableHandler(CustomBasicHandler):
 
 class SearchOneHandler(CustomBasicHandler):
     async def post_process(self, *args, **kwargs):
-        """精确搜索结果,基本结果"""
+        """精确搜索结果,基本结果", 分为前台展示效果，和后台展示效果"""
         data = {}
         keywords = self.data["q"]
-        result = await get_search_one('tss', 'utex', keywords)
-        for i in result:
-            for k, v in i.items():
-                if k == 'key' and v == 'Start':
-                    data.update({"start": i["value"]})
-                elif k == 'key' and v == 'End':
-                    data.update({"end": i['value']})
-        # 切分列表
-        number = len(result)
-        mid = int(number/2 + 1)
-        print(mid)
-        data1 = result[0: mid]
-        data2 = result[mid:]
-        data.update({"data1": data1, "data2": data2})
-        self.send_response_data(MesCode.success, data, info="得到精确搜索结果")
+        mg_type = self.data["mg_type"]  # 后台管理需要的参数
+        if mg_type == 'manager':  # 网站后台发送的请求
+            result = await get_search_one('tss', 'utex', keywords)
+            #  构造一下前端需要使用v-model
+            for each_res in result:
+                for const_key in BASE_DATA_KEY.keys():
+                    if each_res['key'] == const_key:
+                        each_res.update({"const_key": BASE_DATA_KEY[const_key]})
+            self.send_response_data(MesCode.success, result, info="得到精确搜索结果")
+        else:  # 网站前台发送的请求 mg_type=display
+            result = await get_search_one('tss', 'utex', keywords)
+            for i in result:
+                for k, v in i.items():
+                    if k == 'key' and v == 'Start':
+                        data.update({"start": i["value"]})
+                    elif k == 'key' and v == 'End':
+                        data.update({"end": i['value']})
+            # 切分列表
+            number = len(result)
+            mid = int(number / 2 + 1)
+            data1 = result[0: mid]
+            data2 = result[mid:]
+            data.update({"data1": data1, "data2": data2})
+            self.send_response_data(MesCode.success, data, info="得到精确搜索结果")
 
 
 class SearchEnvironmentHandler(CustomBasicHandler):
@@ -261,8 +279,8 @@ class EnvironmentImageHandler(CustomBasicHandler):
                   labs(title=keywords) + xlab("log2FoldChange") + ylab("-1*log10(padj)")
             img.save(keywords, path=get_image_upload_path())
             get_logger().info("%s:火山图保存成功", keywords)
-        re_url = str(self.request.headers['Origin'])+ "/api/image/" + str(keywords) + ".png"
-        print("url:",re_url)
+        re_url = str(self.request.headers['Origin']) + "/api/image/" + str(keywords) + ".png"
+        print("url:", re_url)
         data = {
             "locus_tag": keywords,
             "img_url": re_url
@@ -288,8 +306,6 @@ class PubmedHandler(CustomBasicHandler):
 
 class ColKeyNameHandler(CustomBasicHandler):
     """得到一个集合的键名"""
-
-    @login_required
     async def post_process(self, *args, **kwargs):
         col_name = self.data['col_name']  # 得到查询的集合名称
         res_list = await get_all_keys(col_name)
@@ -301,6 +317,71 @@ class GetOneWeekAccess(CustomBasicHandler):
     async def get_process(self, *args, **kwargs):
         res = await get_date_access()
         return self.send_response_data(MesCode.success, res, info="得到访问量信息")
+
+
+# 更新utex_tss数据库中的一条数据
+class UpdateUtexTssOneData(CustomBasicHandler):
+    async def post_process(self, *args, **kwargs):
+        """
+        前端发送过来的数据格式
+        {"primary_key": "", "document": {...}}
+        """
+        primary_key = self.data["primary_key"]
+        document = self.data["document"]
+        res = await update_utex_tss_one_data(primary_key, document)
+        return self.send_response_data(MesCode.success, {"update": res}, info="更新数据成功")
+
+
+class ImportExcelHandler(CustomBasicHandler):
+    async def post_process(self):
+        get_logger().info('receive ImportExcel')
+        table_name = self.request.arguments.get("table_name", None)
+        if table_name is not None:
+            table_name = table_name[0].decode("utf-8")
+        import_file_info = self.request.files['file'][0]
+        import_file_name, import_data_content = import_file_info['filename'], import_file_info['body']
+        with open(join(import_file_name), 'wb') as import_file_writer:  # 将文件读取到本地
+            import_file_writer.write(import_data_content)
+            import_file_writer.close()
+        # 将文件导入数据库中
+        if table_name is not None:
+            if table_name == 'cyano_genomes':
+                table_key = []  # 表格的头
+                table_res = []  # 保存所有数据
+                with open(import_file_name, 'r') as f:
+                    for i, line in enumerate(f.readlines()):
+                        if i == 0:
+                            table_key = line.strip().split(sep='\t')
+                        else:
+                            tmp = {}
+                            for j in range(len(table_key)):
+                                try:
+                                    tmp[table_key[j]] = line.strip().split(sep='\t')[j]
+                                except:
+                                    tmp[table_key[j]] = ""
+                            table_res.append(tmp)
+                try:  # 将数据插入数据库中
+                    await insert_many_data(collection_name=table_name, data=table_res)
+                    self.send_response_data(MesCode.success, data={}, info="插入成功")
+                except Exception as e:
+                    self.send_response_data(MesCode.fail, data={}, info=e)
+            elif table_name == 'gen_exp':
+                pass
+            else:
+                pass
+        else:
+            self.send_response_data(code=MesCode.fail, data={}, info="没有选择表格")
+
+
+class CyanoGenomesHandler(CustomBasicHandler):
+    async def get_process(self, *args, **kwargs):
+        """
+        首页展示所有的蓝藻组学相关数据: cyano_genomes
+        """
+        res = {}
+        res["header"] = await get_all_keys('cyano_genomes')
+        res["data"] = await get_many_data('cyano_genomes')
+        return self.send_response_data(MesCode.success, data=res, info="得到首页的所有信息")
 
 
 class WebHandler(CustomBasicHandler):
