@@ -54,7 +54,7 @@
         model: null,
 
         options: [
-          'gen_exp', 'cyano_genomes'
+          'gen_exp', 'cyano_genomes','cyano_all_gff',
         ],
 
         panel: 'mails',

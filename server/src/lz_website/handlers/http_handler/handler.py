@@ -226,14 +226,22 @@ class SearchOneHandler(CustomBasicHandler):
                     if each_res['key'] == const_key:
                         each_res.update({"const_key": BASE_DATA_KEY[const_key]})
             self.send_response_data(MesCode.success, result, info="得到精确搜索结果")
-        else:  # 网站前台发送的请求 mg_type=display
-            result = await get_search_one('tss', 'utex', keywords)
-            for i in result:
-                for k, v in i.items():
-                    if k == 'key' and v == 'Start':
-                        data.update({"start": i["value"]})
-                    elif k == 'key' and v == 'End':
-                        data.update({"end": i['value']})
+        elif mg_type == 'display':  # 网站前台发送的请求 mg_type=display
+            # result = await get_search_one('tss', 'utex', keywords) 删除该调用方法
+            # for i in result:
+            #     for k, v in i.items():
+            #         if k == 'key' and v == 'Start':
+            #             data.update({"start": i["value"]})
+            #         elif k == 'key' and v == 'End':
+            #             data.update({"end": i['value']})
+            result = []
+            search_res = await get_many_data('cyano_all_gff', {"$or":[{"Locus_tag": keywords}, {"Gene": keywords}, {"Old_locus_tag": keywords}]})
+            data.update({"label": [search_res[0]["latin_name"], search_res[0]["ref_seq_no"]]})
+            for k, v in search_res[0].items():
+                if k == "Locus_tag":
+                    data.update({"locus_tag": v})
+                tmp = {k: v}
+                result.append(tmp)
             # 切分列表
             number = len(result)
             mid = int(number / 2 + 1)
@@ -345,7 +353,7 @@ class ImportExcelHandler(CustomBasicHandler):
             import_file_writer.close()
         # 将文件导入数据库中
         if table_name is not None:
-            if table_name == 'cyano_genomes':
+            if table_name == 'cyano_genomes' or table_name == 'cyano_all_gff':
                 table_key = []  # 表格的头
                 table_res = []  # 保存所有数据
                 with open(import_file_name, 'r') as f:
@@ -380,8 +388,24 @@ class CyanoGenomesHandler(CustomBasicHandler):
         """
         res = {}
         res["header"] = await get_all_keys('cyano_genomes')
+        if "RefSeq_assm_no" in res["header"]:
+            res["header"].remove("RefSeq_assm_no")
+        res["header"].insert(0, "RefSeq_assm_no")  # 将主键移到队首
         res["data"] = await get_many_data('cyano_genomes')
         return self.send_response_data(MesCode.success, data=res, info="得到首页的所有信息")
+
+
+class CyanoHandler(CustomBasicHandler):
+    async def post_process(self, *args, **kwargs):
+        """
+        通过cyano_name得到对应的数据
+        """
+        cyano_name = self.data["cyano_name"]
+        res = {}
+        res["header"] = await get_all_keys('cyano_all_gff')
+        res["data"] = await get_many_data('cyano_all_gff', {"ref_seq_no": cyano_name})
+        res["ref_seq_no"] = cyano_name
+        return self.send_response_data(MesCode.success, data=res, info="成功得到数据")
 
 
 class WebHandler(CustomBasicHandler):
@@ -409,11 +433,31 @@ class DefaultConfigHandler(CustomBasicHandler):
 
 
 if __name__ == '__main__':
-    work_dir = dirname(dirname(dirname(realpath(__file__))))
-    app = basename(dirname(realpath(__file__)))
-    log_path = join(work_dir, 'media', app + '.csv')
-    uuid_path = join(work_dir, '.appid')
-    print(work_dir)
-    print(app)
-    print(log_path)
-    print(uuid_path)
+    import motor.motor_asyncio
+    import asyncio
+    client = motor.motor_asyncio.AsyncIOMotorClient()
+    handle = client["lz_database"]["cyano_all_gff"]
+    async def test():
+        table_res = []
+        table_key = []
+        with open("CyanoAllGFF.tab", 'r') as f:
+            print("开始读取文件")
+            for i, line in enumerate(f.readlines()):
+                if i == 0:
+                    table_key = line.strip().split(sep='\t')
+                    print(table_key)
+                else:
+                    tmp = {}
+                    for j in range(len(table_key)):
+                        try:
+                            tmp[table_key[j]] = line.strip().split(sep='\t')[j]
+                        except:
+                            tmp[table_key[j]] = ""
+                    print("当前正在处理{}条数据:{}\n".format(i, line.strip().split(sep='\t')))
+                    table_res.append(tmp)
+            print("开始插入数据")
+            await handle.insert_many(table_res)
+            print("插入成功")
+
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(test())

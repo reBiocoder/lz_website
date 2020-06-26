@@ -29,22 +29,24 @@
         <q-space/>
 
         <div class="q-gutter-sm row items-center no-wrap">
-<!--          <q-btn @click="admin" round flat>-->
-<!--            <q-avatar size="26px">-->
-<!--              <q-icon color="grey" name="account_circle"/>-->
-<!--            </q-avatar>-->
-<!--            <q-tooltip>管理员登录</q-tooltip>-->
-<!--          </q-btn>-->
+          <!--          <q-btn @click="admin" round flat>-->
+          <!--            <q-avatar size="26px">-->
+          <!--              <q-icon color="grey" name="account_circle"/>-->
+          <!--            </q-avatar>-->
+          <!--            <q-tooltip>管理员登录</q-tooltip>-->
+          <!--          </q-btn>-->
         </div>
       </q-toolbar>
     </q-header>
 
     <q-drawer
       v-model="leftDrawerOpen"
-      show-if-above
       bordered
       content-class="bg-grey-2"
-      :width="240"
+      :width="200"
+      :mini="miniState"
+      @mouseover="miniState = false"
+      @mouseout="miniState = true"
     >
       <q-scroll-area class="fit">
         <q-list padding>
@@ -59,7 +61,7 @@
 
           <q-separator class="q-my-md"/>
 
-          <q-item v-for="link in links2"  @click="func(link.code)" :key="link.text" v-ripple clickable>
+          <q-item v-for="link in links2" @click="func(link.code)" :key="link.text" v-ripple clickable>
             <q-item-section avatar>
               <q-icon color="grey" :name="link.icon"/>
             </q-item-section>
@@ -75,7 +77,9 @@
     </q-drawer>
 
     <q-page-container>
-      <router-view :key="$route.fullPath"/>
+      <keep-alive include="cyano,index,cyano_detail">
+        <router-view :key="this.$route.fullPath"/>
+      </keep-alive>
     </q-page-container>
   </q-layout>
 </template>
@@ -88,11 +92,12 @@
     name: 'MyLayout',
     data() {
       return {
+        miniState: true,
         logo: farSmileWink,
-        leftDrawerOpen: false,
+        leftDrawerOpen: true,
         search: '',
         links1: [
-          {icon: 'home', text: 'Index', code: "index"},  // 首页
+          {icon: 'home', text: 'Data Set', code: "index"},  // 首页
           //{icon: 'whatshot', text: 'Trending', code:"trending"}, //趋势
         ],
         links2: [
@@ -105,9 +110,9 @@
     methods: {
       ...mapMutations(process.env.APP_SCOPE_NAME, ["changeSearchContent"]),
       //管理员登录,跳转
-      admin(){
+      admin() {
         this.$router.push({
-          name:"login"
+          name: "login"
         })
       },
       //用户搜索得到结果
@@ -123,13 +128,13 @@
 
       },
       // 点击logo,跳转到首页
-      to_index(){
+      to_index() {
         this.$router.push({
           name: "index"
         })
       },
       //点击边页功能
-      func(code){
+      func(code) {
         this.$router.push({
           name: code
         })

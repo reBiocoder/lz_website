@@ -6,7 +6,7 @@ from lz_website.handlers.http_handler.handler import (WebHandler, CyanoGenomesHa
                                                       SearchOneHandler, SearchEnvironmentHandler,
                                                       EnvironmentImageHandler, PubmedHandler,
                                                       ColKeyNameHandler, GetOneWeekAccess,
-                                                      UpdateUtexTssOneData, ImportExcelHandler,
+                                                      UpdateUtexTssOneData, ImportExcelHandler,CyanoHandler,
                                                       )
 
 from .handler import get_image_upload_path
@@ -28,6 +28,7 @@ url = [
     (r'/api/update_tss_utex/', UpdateUtexTssOneData),
     (r'/api/import_excel/', ImportExcelHandler),
     (r'/api/cyano_genomes/', CyanoGenomesHandler),
+    (r'/api/cyano/', CyanoHandler),
     # 图片静态文件处理
     (r'/api/image/(.*)', StaticFileBasicHandler, {"path": get_image_upload_path()})
 ]

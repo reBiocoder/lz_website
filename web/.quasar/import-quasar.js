@@ -17,7 +17,7 @@ import iconSet from 'quasar/icon-set/material-icons'
 
 import Vue from 'vue'
 
-import {Quasar,QTree,QForm,QList,QItem,QItemSection,QItemLabel,QTable,QTh,QTr,QTd,QImg,QSeparator,QPagination,QSkeleton,QUploader,QRadio,QExpansionItem,QInput,QTimeline,QTimelineEntry,QSelect,Notify,LocalStorage,SessionStorage,LoadingBar,Loading} from 'quasar'
+import {Quasar,QTree,QForm,QList,QItem,QItemSection,QItemLabel,QTable,QTh,QTr,QTd,QImg,QSeparator,QPagination,QSkeleton,QUploader,QRadio,QExpansionItem,QInput,QTimeline,QTimelineEntry,QSelect,QTooltip,Notify,LocalStorage,SessionStorage,LoadingBar,Loading} from 'quasar'
 
 
-Vue.use(Quasar, { config: {"loadingBar":{},"loading":{}},lang: lang,iconSet: iconSet,components: {QTree,QForm,QList,QItem,QItemSection,QItemLabel,QTable,QTh,QTr,QTd,QImg,QSeparator,QPagination,QSkeleton,QUploader,QRadio,QExpansionItem,QInput,QTimeline,QTimelineEntry,QSelect},plugins: {Notify,LocalStorage,SessionStorage,LoadingBar,Loading} })
+Vue.use(Quasar, { config: {"loadingBar":{},"loading":{}},lang: lang,iconSet: iconSet,components: {QTree,QForm,QList,QItem,QItemSection,QItemLabel,QTable,QTh,QTr,QTd,QImg,QSeparator,QPagination,QSkeleton,QUploader,QRadio,QExpansionItem,QInput,QTimeline,QTimelineEntry,QSelect,QTooltip},plugins: {Notify,LocalStorage,SessionStorage,LoadingBar,Loading} })

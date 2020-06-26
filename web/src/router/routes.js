@@ -55,8 +55,8 @@ const routes = [
     component: load('display/layout'),
     children: [
       {path: 'index', component: load('display/index'), name: 'index', meta: {title: 'Cyanobacteria Database'}},
-      {
-        path: 'database/:code',
+      { // 该接口暂时不用
+        path: 'detail/:code',
         component: load('display/detail'),
         props: true,
         name: 'detail',
@@ -73,6 +73,20 @@ const routes = [
       {path: 'jbrowse', component: load('display/jbrowse'), name: 'jbrowse', meta: {title: 'JBrowse'}},
       {path: 'trending', component: load('display/trending'), name: 'trending'},
       {path: 'hot', component: load('display/hot'), name: 'hot'},
+      {
+        path: 'cyano/:code',
+        component: load('display/cyano'),
+        props: true,
+        name: 'cyano',
+        meta: {title: 'cyano--Cyanobacteria'}
+      },
+      {
+        path: 'cyano_detail/:code',
+        component: load('display/cyano_detail'),
+        props: true,
+        name: 'cyano_detail',
+        meta: {title: 'cyano_detail--Cyanobacteria'}
+      },
 
 
     ]

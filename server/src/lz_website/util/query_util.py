@@ -478,13 +478,13 @@ async def insert_many_data(collection_name: str, data: list):
     return res
 
 
-async def get_many_data(collection_name: str):
+async def get_many_data(collection_name: str, filter_name: dict = {}):
     """
     得到集合中的所有文档
     """
     handle = await get_collection_handle(collection_name=collection_name)
     res = []
-    async for doc in handle.find({}):
+    async for doc in handle.find(filter_name):
         del doc["_id"]
         res.append(doc)
     return res

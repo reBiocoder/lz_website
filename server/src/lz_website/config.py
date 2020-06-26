@@ -11,7 +11,10 @@ class InitFunc(InitFuncBasic):
             await create_collection_and_index(collection_name="access_date", indexs=[("date", 1)])
         if "cyano_genomes" not in await get_all_collection_names():
             get_logger().info("创建cyano_genomes数据库成功")
-            await create_collection_and_index(collection_name="cyano_genomes", indexs=[("tax_id", 1)])
+            await create_collection_and_index(collection_name="cyano_genomes", indexs=[("RefSeq_assm_no", 1)])
+        if "cyano_all_gff" not in await get_all_collection_names():
+            get_logger().info("创建cyano_all_gff数据库成功")
+            await create_collection_and_index(collection_name="cyano_all_gff", indexs=[("Locus_tag", 1)])
 
 
 class ConfigStore(AppConfigBasic):
