@@ -4,7 +4,7 @@
       <q-tab-panels v-model="panel" animated class="shadow-2 rounded-borders">
         <q-tab-panel name="locus_tag">
           <div class="text-h5">{{this.code}}</div>
-          <q-badge v-for="i in this.label" color="purple" style="margin-right: 10px;">{{i}}</q-badge>
+          <q-badge v-for="(m, n) in this.label" color="purple" style="margin-right: 10px;" :key="n">{{m}}</q-badge>
           <div class="messageBlock">
             <div class="messageBox1">
               <p v-for="i in this.data1">
@@ -25,11 +25,10 @@
         <q-tabs
           v-model="tab"
           dense
-          class="text-grey"
-          active-color="primary"
           indicator-color="primary"
           align="justify"
           narrow-indicator
+          class="bg-purple text-white"
         >
           <q-tab name="environment" label="GENE EXPRESSION"/>
           <q-tab name="jbrowse" label="JBrowse"/>
@@ -96,7 +95,7 @@
     },
     mounted() {
       this.$q.loading.show({
-        message:"Some important <b>process</b> is in progress..."
+        message:"Some important <b>process</b> is in progress!"
       })
       http.search_detail({"mg_type": "display", "q": this.$route.params.code}, (res) => {
         this.code = res.data.data.locus_tag

@@ -42,7 +42,6 @@
     <q-drawer
       v-model="leftDrawerOpen"
       bordered
-      content-class="bg-grey-2"
       :width="200"
       :mini="miniState"
       @mouseover="miniState = false"
