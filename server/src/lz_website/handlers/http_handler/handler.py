@@ -402,18 +402,38 @@ class CyanoGenomesHandler(CustomBasicHandler):
         res["data"] = await get_many_data('cyano_genomes')
         return self.send_response_data(MesCode.success, data=res, info="得到首页的所有信息")
 
+    async def post_process(self, *args, **kwargs):
+        """
+        通过post操作，来进行进行过滤筛选
+        """
+        res = {}
+        res["header"] = await get_all_keys('cyano_genomes')
+        if "RefSeq_assm_no" in res["header"]:
+            res["header"].remove("RefSeq_assm_no")
+        res["header"].insert(0, "RefSeq_assm_no")  # 将主键移到队首
+        q = str(self.data["q"]).strip()  # 搜索条件，只搜索refSeq和species(文本索引)
+        res["data"] = await get_many_data('cyano_genomes', {"$or": [{"$text": {"$search": q}}, {"RefSeq_assm_no": q}, {"Tax_id": q}]})
+        return self.send_response_data(MesCode.success, data=res, info="成功得到搜索结果")
+
 
 class CyanoHandler(CustomBasicHandler):
     async def post_process(self, *args, **kwargs):
         """
         通过cyano_name得到对应的数据
         """
-        cyano_name = self.data["cyano_name"]
-        res = {}
-        res["header"] = await get_all_keys('cyano_all_gff')
-        res["data"] = await get_many_data('cyano_all_gff', {"ref_seq_no": cyano_name})
-        res["ref_seq_no"] = cyano_name
-        return self.send_response_data(MesCode.success, data=res, info="成功得到数据")
+        cyano_name = self.data.get("cyano_name", None)
+        q = self.data.get("q", None)
+        if cyano_name:
+            res = {}
+            res["header"] = await get_all_keys('cyano_all_gff')
+            res["data"] = await get_many_data('cyano_all_gff', {"ref_seq_no": str(cyano_name).strip()})
+            res["ref_seq_no"] = cyano_name
+            return self.send_response_data(MesCode.success, data=res, info="成功得到数据")
+        elif q:
+            res = {}
+            res["header"] = await get_all_keys('cyano_all_gff')
+            res["data"] = await get_many_data('cyano_all_gff', {"$or": [{"Locus_tag": str(q).strip()}, {"Gene": str(q).strip()}, {"Old_locus_tag":str(q).strip()}]})
+            return self.send_response_data(MesCode.success, data=res, info="得到搜索结果")
 
 
 class WebHandler(CustomBasicHandler):

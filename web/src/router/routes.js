@@ -87,8 +87,20 @@ const routes = [
         name: 'cyano_detail',
         meta: {title: 'cyano_detail--Cyanobacteria'}
       },
-
-
+      {
+        path: 'search_species',
+        component: load('display/base_component/search_species'),
+        props: true,
+        name: 'search_species',
+        meta: {title: 'search species'}
+      },
+      {
+        path: 'search_gene',
+        component: load('display/base_component/search_gene'),
+        props: true,
+        name: 'search_gene',
+        meta: {title: 'search locus_tag'}
+      },
     ]
   }
 ]

@@ -27,6 +27,9 @@ export default {
   get_cyano_genomes(cbk){
     $get('/api/cyano_genomes/',cbk)
   },
+  search_cyano_genomes(param, cbk){ //搜索物种数据
+    $post('/api/cyano_genomes/', param, cbk)
+  },
   get_cyano(param, cbk){  //得到特定基因组的基因
     $post('/api/cyano/', param, cbk)
   }

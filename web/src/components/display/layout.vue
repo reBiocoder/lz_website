@@ -23,7 +23,8 @@
           <q-input dense outlined square v-model="search" @keyup.enter="getSearch" placeholder="Search"
                    class="bg-white col">
             <template v-slot:before>
-              <q-select  borderless :display-value="select_search_label" v-model="select_search" :options="options" dense/>
+              <q-select borderless :display-value="select_search_label" v-model="select_search" :options="options"
+                        dense/>
             </template>
           </q-input>
           <q-btn class="YL__toolbar-input-btn" @click="getSearch" color="grey-3" text-color="grey-8" icon="search"
@@ -117,12 +118,11 @@
         ]
       }
     },
-    watch:{
-      select_search:{
-        handler:function (newVal, oldVal) {
+    watch: {
+      select_search: {
+        handler: function (newVal, oldVal) {
           this.select_search_label = newVal.label === undefined ? this.options[0].label : newVal.label
           this.select_search_result = newVal.value === undefined ? this.options[0].value : newVal.value
-          console.log("我的值:"+this.select_search_result)
         }
       }
     },
@@ -145,8 +145,14 @@
             message: "Please input search content"
           })
         } else {
-          this.changeSearchContent(this.search)
-          this.$router.push({name: "search", params: {code: this.search}})
+          this.changeSearchContent(this.search)  //在vuex中存储搜索内容的值
+          if (this.select_search_result === 'cyano_genomes') { //如果搜索物种
+            this.$router.push({name: "search_species", query: {q: this.search}})  // 跳转到物种查询页面
+          } else if (this.select_search_result === 'cyano_all_gff') { // 搜索gene，locus_tag
+            this.$router.push({name: "search_gene", query: {q: this.search}})  // 跳转到物种查询页面
+          } else {
+
+          }
         }
 
       },
