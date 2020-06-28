@@ -21,7 +21,11 @@
 
         <div class="YL__toolbar-input-container row no-wrap">
           <q-input dense outlined square v-model="search" @keyup.enter="getSearch" placeholder="Search"
-                   class="bg-white col"/>
+                   class="bg-white col">
+            <template v-slot:before>
+              <q-select  borderless :display-value="select_search_label" v-model="select_search" :options="options" dense/>
+            </template>
+          </q-input>
           <q-btn class="YL__toolbar-input-btn" @click="getSearch" color="grey-3" text-color="grey-8" icon="search"
                  unelevated/>
         </div>
@@ -91,6 +95,13 @@
     name: 'MyLayout',
     data() {
       return {
+        select_search_label: null,
+        select_search: null,
+        select_search_result: null,
+        options: [
+          {label: "Species", value: "cyano_genomes"},
+          {label: "Gene", value: "cyano_all_gff"}
+        ],
         miniState: true,
         logo: farSmileWink,
         leftDrawerOpen: true,
@@ -105,6 +116,19 @@
           {icon: 'description', text: 'PubMed', code: "pubmed"},
         ]
       }
+    },
+    watch:{
+      select_search:{
+        handler:function (newVal, oldVal) {
+          this.select_search_label = newVal.label === undefined ? this.options[0].label : newVal.label
+          this.select_search_result = newVal.value === undefined ? this.options[0].value : newVal.value
+          console.log("我的值:"+this.select_search_result)
+        }
+      }
+    },
+    mounted() {
+      this.select_search_label = this.options[0].label
+      this.select_search = this.options[0].value
     },
     methods: {
       ...mapMutations(process.env.APP_SCOPE_NAME, ["changeSearchContent"]),
@@ -137,13 +161,28 @@
         this.$router.push({
           name: code
         })
-        console.log(code)
       },
     },
   }
 </script>
 
 <style lang="sass">
+  .q-field--dense
+    .q-field__before, .q-field__prepend
+      padding-right: 0px
+
+    .q-field__native, .q-field__prefix, .q-field__suffix, .q-field__input
+      font-weight: 400
+      line-height: 28px
+      letter-spacing: 0.00937em
+      text-decoration: inherit
+      text-transform: inherit
+      border: none
+      border-radius: 0
+      background: none
+      color: rgba(0, 0, 0, 0.87)
+      padding: 6px 0px 6px 10px
+
   .YL
     &__toolbar-input-container
       min-width: 100px
@@ -165,4 +204,5 @@
 
       &:hover
         color: #000
+
 </style>

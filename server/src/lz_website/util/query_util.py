@@ -403,6 +403,11 @@ async def create_collection_and_index(collection_name: str, indexs: list) -> Non
         for index in indexs:
             await collection_current.create_index([index])
             get_logger().info("创建集合【%s】和索引【%s】成功", collection_current, index)
+    else:
+        collection_current = db.get_collection(collection_name)
+        for index in indexs:
+            await collection_current.create_index([index])
+            get_logger().info("得到集合【%s】,创建索引【%s】成功", collection_current, index)
 
 
 async def get_collection_handle(database_name: str = "lz_database", collection_name: str = ''):

@@ -240,6 +240,14 @@ class SearchOneHandler(CustomBasicHandler):
             for k, v in search_res[0].items():
                 if k == "Locus_tag":
                     data.update({"locus_tag": v})
+                elif k == "Start":
+                    data.update({"start": v})
+                elif k == 'End':
+                    data.update({"end": v})
+                elif k == 'ref_seq_no':
+                    data.update({"ref_seq_no": v})
+                elif k == 'Chr':
+                    data.update({"chr": v})
                 tmp = {k: v}
                 result.append(tmp)
             # 切分列表

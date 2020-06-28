@@ -48,7 +48,7 @@
           </q-tab-panel>
 
           <q-tab-panel name="jbrowse">
-            <jbrowse></jbrowse>
+            <jbrowse :ref_seq_no.sync="refSeqNo" :start.sync="oldStart" :end.sync="oldEnd" :chr="oldChr"></jbrowse>
           </q-tab-panel>
 
           <q-tab-panel name="references">
@@ -91,6 +91,10 @@
         data1: null,
         data2: null,
         label: null,
+        refSeqNo:null,
+        oldStart:null,
+        oldEnd:null,
+        oldChr:null,
       }
     },
     mounted() {
@@ -102,6 +106,10 @@
         this.data1 = res.data.data.data1
         this.data2 = res.data.data.data2
         this.label = res.data.data.label
+        this.refSeqNo = res.data.data.ref_seq_no
+        this.oldStart = res.data.data.start
+        this.oldEnd = res.data.data.end
+        this.oldChr = res.data.data.chr
         this.$q.loading.hide()
       })
     },
