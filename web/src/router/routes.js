@@ -5,7 +5,7 @@ function load(component) {
 const routes = [
   {
     path: '/',
-    redirect: '/admin/'
+    redirect: '/lz/index'
   },
   //------后台管理路由-------
   {

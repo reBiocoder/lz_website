@@ -10,7 +10,7 @@
         :filter="filter"
       >
         <template v-slot:top-left>
-          <div class="text-purple text-h6">This database stores more than 600 kinds of cyanobacteria genome data!</div>
+          <div class="text-purple text-h6">626 complete or draft genomic data of cyanobacteria are included!</div>
         </template>
         <template v-slot:top-right>
           <q-input borderless dense debounce="300" color="primary" v-model="filter" label="Search for expect species">
