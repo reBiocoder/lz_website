@@ -4,7 +4,7 @@
       <q-tab-panels v-model="panel" animated class="shadow-2 rounded-borders">
         <q-tab-panel name="locus_tag">
           <div class="text-h5">{{this.code}}</div>
-          <q-badge v-for="i in this.label" color="purple" style="margin-right: 10px;">{{i}}</q-badge>
+          <q-badge v-for="(m, n) in this.label" color="purple" style="margin-right: 10px;" :key="n">{{m}}</q-badge>
           <div class="messageBlock">
             <div class="messageBox1">
               <p v-for="i in this.data1">
@@ -25,11 +25,10 @@
         <q-tabs
           v-model="tab"
           dense
-          class="text-grey"
-          active-color="primary"
           indicator-color="primary"
           align="justify"
           narrow-indicator
+          class="bg-purple text-white"
         >
           <q-tab name="environment" label="GENE EXPRESSION"/>
           <q-tab name="jbrowse" label="JBrowse"/>
@@ -49,7 +48,7 @@
           </q-tab-panel>
 
           <q-tab-panel name="jbrowse">
-            <jbrowse></jbrowse>
+            <jbrowse :ref_seq_no.sync="refSeqNo" :start.sync="oldStart" :end.sync="oldEnd" :chr="oldChr"></jbrowse>
           </q-tab-panel>
 
           <q-tab-panel name="references">
@@ -92,17 +91,25 @@
         data1: null,
         data2: null,
         label: null,
+        refSeqNo:null,
+        oldStart:null,
+        oldEnd:null,
+        oldChr:null,
       }
     },
     mounted() {
       this.$q.loading.show({
-        message:"Some important <b>process</b> is in progress..."
+        message:"Some important <b>process</b> is in progress!"
       })
       http.search_detail({"mg_type": "display", "q": this.$route.params.code}, (res) => {
         this.code = res.data.data.locus_tag
         this.data1 = res.data.data.data1
         this.data2 = res.data.data.data2
         this.label = res.data.data.label
+        this.refSeqNo = res.data.data.ref_seq_no
+        this.oldStart = res.data.data.start
+        this.oldEnd = res.data.data.end
+        this.oldChr = res.data.data.chr
         this.$q.loading.hide()
       })
     },

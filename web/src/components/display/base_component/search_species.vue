@@ -10,10 +10,12 @@
         :filter="filter"
       >
         <template v-slot:top-left>
-          <div class="text-purple text-h6">626 complete or draft genomic data of cyanobacteria are included!</div>
+          <div class="text-h6">The keyword you entered is: <span class="text-orange text-italic">{{keywords}}</span>,
+            the following are the search resultsspan <span class="text-purple">(species)</span>:
+          </div>
         </template>
         <template v-slot:top-right>
-          <q-input borderless dense debounce="300" color="primary" v-model="filter" label="Search for expect species">
+          <q-input borderless dense debounce="300" color="primary" v-model="filter" label="Exact search">
             <template v-slot:append>
               <q-icon name="search"/>
             </template>
@@ -49,12 +51,13 @@
 </template>
 
 <script>
-  import http from '../../api/display'
+  import http from "src/api/display";
 
   export default {
-    name: 'index',
+    name: "search_species",
     data() {
       return {
+        keywords: "",
         filter: null,
         pagination: {
           page: 1, //初始页面在1页
@@ -66,10 +69,10 @@
       }
     },
     method: {},
-    components: {
-    },
+    components: {},
     mounted: function () {
-      http.get_cyano_genomes((res) => {
+      this.keywords = this.$route.query["q"]
+      http.search_cyano_genomes({"q": this.$route.query["q"]}, (res) => {
           if (res.data.code === "success") {
             let header = res.data.data.header
             let raw_header = []
