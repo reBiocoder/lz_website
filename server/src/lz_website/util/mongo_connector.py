@@ -10,7 +10,7 @@ from mg_app_framework.components import (
 
 class MongodbConfig(mongodb_connector.MongodbConfigBasic):
     def get_mongodb_host(self):
-        return '127.0.0.1'
+        return '124.70.143.103'
 
     def get_mongodb_port(self):
-        return 27017
+        return 27010
