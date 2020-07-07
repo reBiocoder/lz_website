@@ -6,7 +6,7 @@ import router from "src/router/index";
 // so we can reference it in Vue files
 // without the need to import axios
 let http = axios.create({
-  timeout: 35000,
+  timeout: 500000,
   baseURL: process.env.http_base_url,
   headers: {'content-type': 'application/x-www-form-urlencoded'},
   withCredentials: true

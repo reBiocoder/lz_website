@@ -44,7 +44,7 @@
         <q-tab-panels v-model="tab" animated>
 
           <q-tab-panel name="environment">
-            <environment></environment>
+            <environment :locus_tag.sync="locus_tag"></environment>
           </q-tab-panel>
 
           <q-tab-panel name="jbrowse">
@@ -81,6 +81,9 @@
   import homologs from "components/display/base_component/homologs";
   import mutants from "components/display/base_component/mutants";
 
+  import {mapMutations} from "vuex";
+
+  const SCOPE = process.env.APP_SCOPE_NAME
   export default {
     name: "cyano_detail",
     data() {
@@ -91,18 +94,24 @@
         data1: null,
         data2: null,
         label: null,
-        refSeqNo:null,
-        oldStart:null,
-        oldEnd:null,
-        oldChr:null,
+        locus_tag: null,
+        refSeqNo: null,
+        oldStart: null,
+        oldEnd: null,
+        oldChr: null,
       }
     },
-    mounted() {
+    methods: {
+      ...mapMutations(SCOPE, ['changeLocus_tag'])
+    },
+    created() {
       this.$q.loading.show({
-        message:"Some important <b>process</b> is in progress!"
+        message: "Some important <b>process</b> is in progress!"
       })
       http.search_detail({"mg_type": "display", "q": this.$route.params.code}, (res) => {
         this.code = res.data.data.locus_tag
+        this.changeLocus_tag(res.data.data.locus_tag)
+        this.locus_tag = res.data.data.locus_tag
         this.data1 = res.data.data.data1
         this.data2 = res.data.data.data2
         this.label = res.data.data.label
