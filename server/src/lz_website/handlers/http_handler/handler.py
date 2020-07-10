@@ -29,6 +29,8 @@ from lz_website.util.redis_util import (insert_data,
                                         )
 from lz_website.auth.hashers import (login_required)
 from lz_website.util.const_values import BASE_DATA_KEY
+from lz_website.util import script
+
 
 import json
 import uuid
@@ -450,6 +452,21 @@ class CyanoHandler(CustomBasicHandler):
             res["data"] = await get_many_data('cyano_all_gff', {
                 "$or": [{"Locus_tag": str(q).strip()}, {"Gene": str(q).strip()}, {"Old_locus_tag": str(q).strip()}]})
             return self.send_response_data(MesCode.success, data=res, info="得到搜索结果")
+
+
+class HomologousHnadler(CustomBasicHandler):
+    async def post_process(self, *args, **kwargs):
+        locus_tag = self.data.get("locus_tag", None)
+        if locus_tag:
+            homolog = script.Homologous(locus_tag)
+            stdcode, stdout, stderr = homolog.shell()
+            table_res = homolog.file_to_json(stdcode, stdout. stderr)
+            if table_res['code']:  # 正常返回
+                return self.send_response_data(MesCode.success, data=table_res, info="homologous right")
+            else:
+                return self.send_response_data(MesCode.fail, data=table_res['error'], info="homologous error")
+        else:
+            return self.send_response_data(MesCode.fail, data={'error': 'not locus_tag'}, info="homologous error")
 
 
 class WebHandler(CustomBasicHandler):
