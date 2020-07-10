@@ -48,7 +48,7 @@ class ConfigStore(AppConfigBasic):
         return '127.0.0.1'
 
     def get_app_port(self):
-        return 18882
+        return 80
 
     def connect_admin(self):
         return False
