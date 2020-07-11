@@ -86,6 +86,7 @@ module.exports = function (ctx) {
         'QTimelineEntry',
         'QSelect',
         'QTooltip',
+        'QInnerLoading'
       ],
       directives: [],
       config: {

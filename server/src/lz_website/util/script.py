@@ -1,6 +1,5 @@
 import asyncio
 import os
-import shutil
 
 
 class Homologous:

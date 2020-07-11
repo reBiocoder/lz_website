@@ -103,13 +103,11 @@
     mounted() {
       this.code = `Basic Information Of ${this.$route.params.code}`
       http.search_detail({"q": this.$route.params.code, 'mg_type': 'display'}, (res) => {
-        console.log("123")
         if (res.data.code === "success") {
           this.data1 = res.data.data.data1
           this.data2 = res.data.data.data2
           this.changeGeneStart(res.data.data.start)
           this.changeGeneEnd(res.data.data.end)
-          console.log(res.data.data.locus_tag)
           this.changeLocus_tag(res.data.data.locus_tag) //将当前正在检索的locus_tag存储在vuex中
         } else {
           this.$q.notify({

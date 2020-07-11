@@ -8,13 +8,13 @@
           <div class="messageBlock">
             <div class="messageBox1">
               <p v-for="i in this.data1">
-                <span v-for="(j, z) in i" class="messageLabel ng-binding">{{z}}: <span
+                <span v-for="(j, z) in i" class="messageLabel ng-binding">{{convertKey(z)}}: <span
                   style="font-weight: 350;margin-left: 10px;">{{j}}</span></span>
               </p>
             </div>
             <div class="messageBox2">
               <p v-for="i in this.data2">
-                <span v-for="(j, z) in i" class="messageLabel ng-binding">{{z}}:  <span
+                <span v-for="(j, z) in i" class="messageLabel ng-binding">{{convertKey(z)}}:  <span
                   style="font-weight: 350;margin-left: 10px;">{{j}}</span></span>
               </p>
             </div>
@@ -25,23 +25,25 @@
         <q-tabs
           v-model="tab"
           dense
-          indicator-color="primary"
           align="justify"
-          narrow-indicator
-          class="bg-purple text-white"
+          inline-label
+          indicator-color="blue"
+          active-bg-color="blue"
+          active-color="black"
+          class="bg-blue-14  text-white shadow-2"
         >
           <q-tab name="environment" label="GENE EXPRESSION"/>
           <q-tab name="jbrowse" label="JBrowse"/>
+          <q-tab name="homologs" label="homologs"/>
           <q-tab name="references" label="references"/>
           <q-tab name="sequences" label="sequences"/>
-          <q-tab name="homologs" label="homologs"/>
           <q-tab name="mutants" label="mutants"/>
 
         </q-tabs>
 
         <q-separator/>
 
-        <q-tab-panels v-model="tab" animated>
+        <q-tab-panels v-model="tab" :keep-alive="isHomologed" animated>
 
           <q-tab-panel name="environment">
             <environment :locus_tag.sync="locus_tag"></environment>
@@ -51,16 +53,16 @@
             <jbrowse :ref_seq_no.sync="refSeqNo" :start.sync="oldStart" :end.sync="oldEnd" :chr="oldChr"></jbrowse>
           </q-tab-panel>
 
+          <q-tab-panel name="homologs">
+            <homologs :locus_tag.sync="locus_tag"></homologs>
+          </q-tab-panel>
+
           <q-tab-panel name="references">
             <references></references>
           </q-tab-panel>
 
           <q-tab-panel name="sequences">
             <sequences></sequences>
-          </q-tab-panel>
-
-          <q-tab-panel name="homologs">
-            <homologs></homologs>
           </q-tab-panel>
 
           <q-tab-panel name="mutants">
@@ -80,6 +82,7 @@
   import sequences from "components/display/base_component/sequences";
   import homologs from "components/display/base_component/homologs";
   import mutants from "components/display/base_component/mutants";
+  import {convertKey} from '../../utils/constants';
 
   import {mapMutations} from "vuex";
 
@@ -88,6 +91,7 @@
     name: "cyano_detail",
     data() {
       return {
+        isHomologed: true,
         tab: 'environment',
         code: "",
         panel: 'locus_tag',
@@ -102,7 +106,10 @@
       }
     },
     methods: {
-      ...mapMutations(SCOPE, ['changeLocus_tag'])
+      ...mapMutations(SCOPE, ['changeLocus_tag']),
+      convertKey(key) {
+        return convertKey(key)
+      }
     },
     created() {
       this.$q.loading.show({

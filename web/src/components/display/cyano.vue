@@ -69,6 +69,7 @@
 
 <script>
   import http from '../../api/display'
+  import {convertKey} from "src/utils/constants";
 
   export default {
     name: "cyano",
@@ -93,7 +94,7 @@
             for (let i = 0, len = header.length; i < len; ++i) {
               raw_header.push({
                 "name": header[i],
-                "label": header[i],
+                "label": convertKey(header[i]),
                 "align": "center",
                 "field": header[i],
                 "sortable": true

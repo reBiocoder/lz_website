@@ -231,13 +231,6 @@ class SearchOneHandler(CustomBasicHandler):
                         each_res.update({"const_key": BASE_DATA_KEY[const_key]})
             self.send_response_data(MesCode.success, result, info="得到精确搜索结果")
         elif mg_type == 'display':  # 网站前台发送的请求 mg_type=display
-            # result = await get_search_one('tss', 'utex', keywords) 删除该调用方法
-            # for i in result:
-            #     for k, v in i.items():
-            #         if k == 'key' and v == 'Start':
-            #             data.update({"start": i["value"]})
-            #         elif k == 'key' and v == 'End':
-            #             data.update({"end": i['value']})
             result = []
             search_res = await get_many_data('cyano_all_gff', {
                 "$or": [{"Locus_tag": keywords}, {"Gene": keywords}, {"Old_locus_tag": keywords}]})
