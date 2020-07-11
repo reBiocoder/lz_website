@@ -8,7 +8,8 @@ class Homologous:
         self.locus_tag = locus_tag
 
     def command(self):
-        return "echo '200408@abc!' | sudo -S bash prepare.sh " + str(self.locus_tag)
+        # return "echo '******' | sudo -S bash prepare.sh " + str(self.locus_tag)
+        return "sudo bash prepare.sh " + str(self.locus_tag)
 
     async def shell(self):
         proc = await asyncio.create_subprocess_shell(
