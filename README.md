@@ -21,5 +21,5 @@
 ![详细页](https://i.loli.net/2020/07/01/wzVsxmYqlFoWeEu.png)
 
 ## 在线体验
-[lz_website](http://122.152.195.44/#/lz/index)
+[lz_website](http://124.70.143.103/#/lz/index)
 
