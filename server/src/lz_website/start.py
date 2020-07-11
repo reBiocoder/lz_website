@@ -1,8 +1,9 @@
-from mg_app_framework import app_start, set_store, set_config_func, set_init_task,TaskKey
+from mg_app_framework import app_start, set_store, set_config_func, set_init_task, TaskKey
 from lz_website.config import ConfigStore, InitFunc
 
 from lz_website.util import mongo_connector
 from lz_website.util import redis_connector
+
 
 async def config_process():
     pass

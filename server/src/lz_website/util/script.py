@@ -8,7 +8,7 @@ class Homologous:
         self.locus_tag = locus_tag
 
     def command(self):
-        return "sudo bash prepare.sh " + str(self.locus_tag)
+        return "echo '200408@abc!' | sudo -S bash prepare.sh " + str(self.locus_tag)
 
     async def shell(self):
         proc = await asyncio.create_subprocess_shell(
@@ -19,16 +19,18 @@ class Homologous:
         stdout, stderr = await proc.communicate()
         return proc.returncode, stdout.decode(), stderr.decode()
 
-    def file_to_json(self, status_code, stdout=None, stderr=None):
+    async def file_to_json(self, status_code, stdout=None, stderr=None):
         """
         status_code: shell返回状态码
         stdout: 脚本的输出内容
+        ['/home/xiaoming/HomologsBP_OUT/AOY38_RS11550.1594435896374.out6', '1594435896374', '']
         stderr: 错误输出
         """
+        stdout_list = str(stdout).split('\n')
+        timestamp = stdout_list[1]  # 文件夹对应时间戳
         result = {}
         if status_code == 0 and stdout:  # 正常返回
-            tmp_path = str(stdout).strip('\n')
-            file_path = tmp_path + '.hom'
+            file_path = stdout_list[0]
             table_key = []  # 表格的头
             table_res = []  # 保存所有数据
             with open(str(file_path), 'r') as f:
@@ -47,9 +49,11 @@ class Homologous:
             result["header"] = table_key
             result['data'] = table_res
             result["code"] = 1  # 正确的输出
-            dir_path = os.path.dirname(tmp_path)
-            shutil.rmtree(dir_path)  # 清空文件夹
-            os.mkdir(dir_path)  # 创建该文件夹
+            dir_path = os.path.dirname(file_path)
+            tmp_file = str(self.locus_tag) + '.' + str(timestamp) + '.*'
+            current_path = os.path.join(dir_path, tmp_file)
+            command = 'sudo rm -rf ' + str(current_path)
+            await asyncio.create_subprocess_shell(command)  # 删除相关文件
             return result
         else:
             result["code"] = 0  # 错误输出a

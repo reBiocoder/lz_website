@@ -454,13 +454,13 @@ class CyanoHandler(CustomBasicHandler):
             return self.send_response_data(MesCode.success, data=res, info="得到搜索结果")
 
 
-class HomologousHnadler(CustomBasicHandler):
+class HomologousHandler(CustomBasicHandler):
     async def post_process(self, *args, **kwargs):
         locus_tag = self.data.get("locus_tag", None)
         if locus_tag:
             homolog = script.Homologous(locus_tag)
-            stdcode, stdout, stderr = homolog.shell()
-            table_res = homolog.file_to_json(stdcode, stdout. stderr)
+            stdcode, stdout, stderr = await homolog.shell()
+            table_res = await homolog.file_to_json(stdcode, stdout, stderr)
             if table_res['code']:  # 正常返回
                 return self.send_response_data(MesCode.success, data=table_res, info="homologous right")
             else:

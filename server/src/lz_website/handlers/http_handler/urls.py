@@ -7,7 +7,7 @@ from lz_website.handlers.http_handler.handler import (WebHandler, CyanoGenomesHa
                                                       EnvironmentImageHandler, PubmedHandler,
                                                       ColKeyNameHandler, GetOneWeekAccess,
                                                       UpdateUtexTssOneData, ImportExcelHandler, CyanoHandler,
-                                                      HomologousHnadler
+                                                      HomologousHandler
                                                       )
 
 from .handler import get_image_upload_path
@@ -30,7 +30,7 @@ url = [
     (r'/api/import_excel/', ImportExcelHandler),
     (r'/api/cyano_genomes/', CyanoGenomesHandler),
     (r'/api/cyano/', CyanoHandler),
-    (r'/api/homolog/', HomologousHnadler),
+    (r'/api/homolog/', HomologousHandler),
     # 图片静态文件处理
     (r'/api/image/(.*)', StaticFileBasicHandler, {"path": get_image_upload_path()})
 ]
