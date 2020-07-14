@@ -27,9 +27,9 @@
               :props="props"
             >
               {{ col.label }}
-              <q-tooltip>
-                Some text as content of Tooltip
-              </q-tooltip>
+<!--              <q-tooltip>-->
+<!--                Some text as content of Tooltip-->
+<!--              </q-tooltip>-->
             </q-th>
           </q-tr>
         </template>
@@ -50,6 +50,7 @@
 
 <script>
   import http from '../../api/display'
+  import { convertCyanoKey } from '../../utils/constants'
 
   export default {
     name: 'index',
@@ -76,7 +77,7 @@
             for (let i = 0, len = header.length; i < len; ++i) {
               raw_header.push({
                 "name": header[i],
-                "label": header[i],
+                "label": convertCyanoKey(header[i]),
                 "align": "center",
                 "field": header[i],
                 "sortable": true

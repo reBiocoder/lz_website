@@ -84,6 +84,7 @@
 
   import {mapMutations} from "vuex";
 
+  const SCOPE = process.env.APP_SCOPE_NAME
   export default {
     name: "detail",
     data() {
@@ -97,7 +98,7 @@
       }
     },
     methods: {
-      ...mapMutations(process.env.APP_SCOPE_NAME, ['changeGeneStart', 'changeGeneEnd'])
+      ...mapMutations(SCOPE, ['changeGeneStart', 'changeGeneEnd', 'changeLocus_tag'])
     },
     mounted() {
       this.code = `Basic Information Of ${this.$route.params.code}`
@@ -107,6 +108,7 @@
           this.data2 = res.data.data.data2
           this.changeGeneStart(res.data.data.start)
           this.changeGeneEnd(res.data.data.end)
+          this.changeLocus_tag(res.data.data.locus_tag) //将当前正在检索的locus_tag存储在vuex中
         } else {
           this.$q.notify({
               message: "Please try again"
@@ -116,7 +118,7 @@
       })
     },
     components: {
-      environment,jbrowse,references,sequences,homologs,mutants
+      environment, jbrowse, references, sequences, homologs, mutants
     }
   }
 </script>

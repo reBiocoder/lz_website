@@ -6,6 +6,7 @@ let state = {
   search_content: null,
   gene_start:null,
   gene_end:null,
+  locus_tag: null, //locus_tag
 
   //后台管理所需要的数据
   click_title: "", //当前侧边栏所点击的栏目

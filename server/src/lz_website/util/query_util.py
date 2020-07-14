@@ -135,23 +135,47 @@ def get_all_padj_and_log2FoldChange_keys(keys_list: list, identify: str, split: 
     return result
 
 
-async def get_environment_result(locus_tag: str, raw_col: str = 'gen_exp') -> list:
+def split_condition_doc(raw_doc: dict, identify1: str, identify2: str, gse: str, split: str = "_"):
+    result = []
+    locus_doc = {"GSE": gse}
+    for k, v in raw_doc.items():
+        doc = {}
+        if str(k).endswith(identify1) or str(k).endswith(identify2):
+            tmp = k
+            split_content = str(tmp).split(split)
+            condition = "_".join(split_content[0:-1])
+            identify = split_content[-1]
+            doc["condition"] = condition
+            doc[identify] = v
+        else:
+            locus_doc[k] = v  # 加入 locus_tag和 old_locus_tag
+            continue
+        doc.update(locus_doc)
+        result.append(doc)
+    res = []
+    for i in result:
+        for j in result:
+            if i["condition"] == j["condition"] and i != j:
+                i.update(j)
+                if i not in res:
+                    res.append(i)
+    return res  # 最终结果，直接插入mongo
+
+
+async def get_environment_result():  # 已经废弃
+    pass
+
+
+async def useQueryGetDocs(query: dict, raw_col: str = 'padj_log2') -> list:
     """这里用的标记是locus_tags"""
-    # import motor
-    # mongo_client = motor.MotorClient()
     mongo_client = get_handler(TaskKey.mongodb_async)
     db = mongo_client["lz_database"]
-    col = db["padj_log2"]  # 得到padj_log2集合
-    col_count = await col.estimated_document_count()  # 集合中文档的数量
-    if col_count:  # 存在文档
-        result = []
-        async for i in col.find({"locus_tags": locus_tag}):
-            del i["_id"]  # 删除主键
-            result.append(i)
-        return result
-    else:  # 不存在该文档
-        create_col = await create_padj_and_log2_collection(str(raw_col))
-        return []
+    col = db[raw_col]  # 得到padj_log2集合
+    result = []
+    async for i in col.find(query):
+        del i["_id"]  # 删除主键
+        result.append(i)
+    return result
 
 
 # 处理genexp表格中的数据,
@@ -404,10 +428,7 @@ async def create_collection_and_index(collection_name: str, indexs: list) -> Non
             await collection_current.create_index([index])
             get_logger().info("创建集合【%s】和索引【%s】成功", collection_current, index)
     else:
-        collection_current = db.get_collection(collection_name)
-        for index in indexs:
-            await collection_current.create_index([index])
-            get_logger().info("得到集合【%s】,创建索引【%s】成功", collection_current, index)
+        get_logger().info("集合【%s】已经创建，无需重复创建", collection_name)
 
 
 async def get_collection_handle(database_name: str = "lz_database", collection_name: str = ''):

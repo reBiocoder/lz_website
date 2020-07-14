@@ -20,7 +20,8 @@ from lz_website.util.query_util import (use_locustag_get_result, insert_many_dat
                                         get_environment_result, get_all_keys,
                                         get_image_json, get_menu, add_menu,
                                         update_date_access, get_date_access,
-                                        update_utex_tss_one_data
+                                        update_utex_tss_one_data, split_condition_doc,
+                                        useQueryGetDocs
                                         )
 from lz_website.auth.hashers import make_password, set_cookie, login_required
 from lz_website.util.redis_util import (insert_data,
@@ -28,9 +29,12 @@ from lz_website.util.redis_util import (insert_data,
                                         )
 from lz_website.auth.hashers import (login_required)
 from lz_website.util.const_values import BASE_DATA_KEY
+from lz_website.util import script
+
 
 import json
 import uuid
+import xlrd
 
 
 def uuid_naming_strategy() -> str:
@@ -227,15 +231,9 @@ class SearchOneHandler(CustomBasicHandler):
                         each_res.update({"const_key": BASE_DATA_KEY[const_key]})
             self.send_response_data(MesCode.success, result, info="得到精确搜索结果")
         elif mg_type == 'display':  # 网站前台发送的请求 mg_type=display
-            # result = await get_search_one('tss', 'utex', keywords) 删除该调用方法
-            # for i in result:
-            #     for k, v in i.items():
-            #         if k == 'key' and v == 'Start':
-            #             data.update({"start": i["value"]})
-            #         elif k == 'key' and v == 'End':
-            #             data.update({"end": i['value']})
             result = []
-            search_res = await get_many_data('cyano_all_gff', {"$or":[{"Locus_tag": keywords}, {"Gene": keywords}, {"Old_locus_tag": keywords}]})
+            search_res = await get_many_data('cyano_all_gff', {
+                "$or": [{"Locus_tag": keywords}, {"Gene": keywords}, {"Old_locus_tag": keywords}]})
             data.update({"label": [search_res[0]["latin_name"], search_res[0]["ref_seq_no"]]})
             for k, v in search_res[0].items():
                 if k == "Locus_tag":
@@ -264,13 +262,12 @@ class SearchEnvironmentHandler(CustomBasicHandler):
         """精确搜索, 环境结果"""
         keywords = self.data["q"]
         get_logger().info("搜索的内容为%s", keywords)
-        result = await get_environment_result(keywords)
+        result = await useQueryGetDocs({"Locus_tag": keywords})
         self.send_response_data(MesCode.success, result, info="得到精确搜索结果,环境标签")
 
 
 class EnvironmentImageHandler(CustomBasicHandler):
     async def post_process(self, *args, **kwargs):
-        print(self.request.headers)
         """环境结果, 得到火山图"""
         from mg_app_framework.web import StaticFileBasicHandler
         keywords = self.data["q"]
@@ -322,6 +319,7 @@ class PubmedHandler(CustomBasicHandler):
 
 class ColKeyNameHandler(CustomBasicHandler):
     """得到一个集合的键名"""
+
     async def post_process(self, *args, **kwargs):
         col_name = self.data['col_name']  # 得到查询的集合名称
         res_list = await get_all_keys(col_name)
@@ -381,8 +379,19 @@ class ImportExcelHandler(CustomBasicHandler):
                     self.send_response_data(MesCode.success, data={}, info="插入成功")
                 except Exception as e:
                     self.send_response_data(MesCode.fail, data={}, info=e)
-            elif table_name == 'gen_exp':
-                pass
+            elif table_name == 'padj_log2':
+                book = xlrd.open_workbook(import_file_name)
+                sheet = book.sheet_by_index(0)
+                table_header = sheet.row_values(0)
+                for i in range(1, sheet.nrows):
+                    raw_doc = {}
+                    raw_data = list(map(lambda x: str(x), sheet.row_values(i)))
+                    for (k, v) in enumerate(table_header):
+                        raw_doc[v] = raw_data[k]
+                    docs = split_condition_doc(raw_doc, 'log2FC', 'padj', str(import_file_name).split('.')[0])
+                    await insert_many_data(collection_name="padj_log2", data=docs)
+                    get_logger().info("向padj_log2中插入数据成功")
+                self.send_response_data(MesCode.success, data={}, info="插入成功")
             else:
                 pass
         else:
@@ -412,7 +421,8 @@ class CyanoGenomesHandler(CustomBasicHandler):
             res["header"].remove("RefSeq_assm_no")
         res["header"].insert(0, "RefSeq_assm_no")  # 将主键移到队首
         q = str(self.data["q"]).strip()  # 搜索条件，只搜索refSeq和species(文本索引)
-        res["data"] = await get_many_data('cyano_genomes', {"$or": [{"$text": {"$search": q}}, {"RefSeq_assm_no": q}, {"Tax_id": q}]})
+        res["data"] = await get_many_data('cyano_genomes',
+                                          {"$or": [{"$text": {"$search": q}}, {"RefSeq_assm_no": q}, {"Tax_id": q}]})
         return self.send_response_data(MesCode.success, data=res, info="成功得到搜索结果")
 
 
@@ -432,8 +442,24 @@ class CyanoHandler(CustomBasicHandler):
         elif q:
             res = {}
             res["header"] = await get_all_keys('cyano_all_gff')
-            res["data"] = await get_many_data('cyano_all_gff', {"$or": [{"Locus_tag": str(q).strip()}, {"Gene": str(q).strip()}, {"Old_locus_tag":str(q).strip()}]})
+            res["data"] = await get_many_data('cyano_all_gff', {
+                "$or": [{"Locus_tag": str(q).strip()}, {"Gene": str(q).strip()}, {"Old_locus_tag": str(q).strip()}]})
             return self.send_response_data(MesCode.success, data=res, info="得到搜索结果")
+
+
+class HomologousHandler(CustomBasicHandler):
+    async def post_process(self, *args, **kwargs):
+        locus_tag = self.data.get("locus_tag", None)
+        if locus_tag:
+            homolog = script.Homologous(locus_tag)
+            stdcode, stdout, stderr = await homolog.shell()
+            table_res = await homolog.file_to_json(stdcode, stdout, stderr)
+            if table_res['code']:  # 正常返回
+                return self.send_response_data(MesCode.success, data=table_res, info="homologous right")
+            else:
+                return self.send_response_data(MesCode.fail, data=table_res['error'], info="homologous error")
+        else:
+            return self.send_response_data(MesCode.fail, data={'error': 'not locus_tag'}, info="homologous error")
 
 
 class WebHandler(CustomBasicHandler):
@@ -463,8 +489,11 @@ class DefaultConfigHandler(CustomBasicHandler):
 if __name__ == '__main__':
     import motor.motor_asyncio
     import asyncio
+
     client = motor.motor_asyncio.AsyncIOMotorClient()
     handle = client["lz_database"]["cyano_all_gff"]
+
+
     async def test():
         table_res = []
         table_key = []
@@ -486,6 +515,7 @@ if __name__ == '__main__':
             print("开始插入数据")
             await handle.insert_many(table_res)
             print("插入成功")
+
 
     loop = asyncio.get_event_loop()
     loop.run_until_complete(test())

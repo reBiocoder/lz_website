@@ -52,6 +52,7 @@
 
 <script>
   import http from "src/api/display";
+  import {convertCyanoKey} from "src/utils/constants";
 
   export default {
     name: "search_species",
@@ -79,7 +80,7 @@
             for (let i = 0, len = header.length; i < len; ++i) {
               raw_header.push({
                 "name": header[i],
-                "label": header[i],
+                "label": convertCyanoKey(header[i]),
                 "align": "center",
                 "field": header[i],
                 "sortable": true

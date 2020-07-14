@@ -54,7 +54,7 @@
         model: null,
 
         options: [
-          'gen_exp', 'cyano_genomes','cyano_all_gff',
+          'padj_log2', 'cyano_genomes','cyano_all_gff',
         ],
 
         panel: 'mails',
@@ -90,7 +90,7 @@
         if (file) {
           let splits = file.name.split('.')
           let suffix = splits[splits.length - 1]
-          if (suffix === 'tab') {
+          if (suffix === 'tab' || suffix === "xlsx") {
             this.uploadFile(file, event)
           } else {
             //this.$refs.excelFile.value = ''

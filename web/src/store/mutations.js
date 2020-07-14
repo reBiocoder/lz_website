@@ -34,3 +34,9 @@ export const changeClickTitle = (state, data) => {
     state.click_title = data
   }
 }
+
+export const changeLocus_tag = (state, data) => { //存储当前搜索的locus_tag
+  if(data){
+    state.locus_tag = data
+  }
+}
