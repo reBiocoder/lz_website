@@ -1,14 +1,20 @@
 import asyncio
 import os
 
+import Bio
+from Bio import SeqIO
+
 
 class Homologous:
+    """
+    调用服务器内部shell
+    """
     def __init__(self, locus_tag):
         self.locus_tag = locus_tag
 
     def command(self):
-        # return "echo '******' | sudo -S bash prepare.sh " + str(self.locus_tag)
-        return "sudo bash prepare.sh " + str(self.locus_tag)
+        return "echo '200408@abc!' | sudo -S bash prepare.sh " + str(self.locus_tag)
+        # return "sudo bash prepare.sh " + str(self.locus_tag)
 
     async def shell(self):
         proc = await asyncio.create_subprocess_shell(
@@ -61,9 +67,64 @@ class Homologous:
             return result
 
 
+class Sequence:
+    def __init__(self, refseq_no, chr, start, end, Lstart, Lend, strand):
+        self.refseq_no = refseq_no
+        self.chr = chr
+        self.start = int(start) - 1
+        self.end = int(end)
+        self.Lstart = int(Lstart)
+        self.Lend = int(Lend)
+        self.strand = strand
+
+    def rev(self, seq):
+        base_trans = {'A': 'T', 'C': 'G', 'T': 'A', 'G': 'C', 'a': 't', 'c': 'g', 't': 'a', 'g': 'c'}
+        rev_seq = list(reversed(seq))
+        rev_seq_list = [base_trans[k] for k in rev_seq]
+        rev_seq = ''.join(rev_seq_list)
+        return rev_seq
+
+    def file_path(self):
+        # base_path = '/home/xiaoming/Homologs/data'
+        base_path = '/Users/sophia/PycharmProjects/lz/server'
+        current_path = os.path.join(base_path, self.refseq_no)
+        for root, dirs, files in os.walk(current_path):# 该目录下只存在一个文件
+            file_name = files[0]
+        file_path = os.path.join(current_path, file_name)
+        return file_path
+
+    def get_json_data(self):
+        fna_dict = SeqIO.to_dict(SeqIO.parse(self.file_path(), 'fasta'))
+        sub_seq = fna_dict[self.chr].seq[self.start: self.end]
+        if self.strand == '-':
+            sub_seq = self.rev(sub_seq)
+        up_end = self.Lstart - self.start - 1
+        orf_start = up_end + 1
+        orf_end = self.Lend - self.start
+        down_start = orf_end + 1
+        if self.Lstart >= self.start and self.end >= self.Lend:
+            result = sub_seq[0: up_end].lower() + "<span style='color: blue'>"+ \
+                sub_seq[up_end: orf_end] + '</span>' + sub_seq[orf_end:].lower()
+        elif self.Lstart < self.start < self.Lend <= self.end:
+            result = "<span style='color: blue'>" + sub_seq[0: orf_end] + \
+                     '</span>' + sub_seq[orf_end:].lower()
+        elif self.start <= self.Lstart < self.end < self.Lend:
+            result = sub_seq[0: up_end].lower() + "<span style='color: blue'>" + \
+                sub_seq[up_end:] + '</span>'
+        else:
+            result = sub_seq
+
+
+
+
+
+
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    a = Homologous('TX50_RS00020')
-    stdcode, stdout, stderr = loop.run_until_complete(a.shell())
-    print(a.file_to_json(stdcode, stdout, stderr))
+    a = Sequence('GCF_000464785.1', 'NZ_KE734717.1', '14449', '17067',
+                 '14449', '17067', '+')
+    a.file_path()
+    # loop = asyncio.get_event_loop()
+    # a = Homologous('TX50_RS00020')
+    # stdcode, stdout, stderr = loop.run_until_complete(a.shell())
+    # print(a.file_to_json(stdcode, stdout, stderr))
 

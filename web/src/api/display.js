@@ -37,4 +37,7 @@ export default {
   get_homolog(param, cbk) {  //得到homologous
     $post('http://124.70.143.103:18882/api/homolog/', param, cbk)
   },
+  get_sequence(param, cbk){ //得到序列
+    $post('/api/sequence/', param, cbk)
+  }
 }

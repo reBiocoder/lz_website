@@ -462,11 +462,21 @@ class HomologousHandler(CustomBasicHandler):
             return self.send_response_data(MesCode.fail, data={'error': 'not locus_tag'}, info="homologous error")
 
 
-class WebHandler(CustomBasicHandler):
-    async def get_process(self):
-        num_data = {}
-        self.send_response_data(MesCode.success, num_data, 'success get data')
+class SequenceHandler(CustomBasicHandler):
+    async def post_process(self, *args, **kwargs):
+        num_data = {'title': '>GCF_000009725.1 [NC_000911.1:2300115..231446; +; -2068668bp]'}
+        text = """tattcgttttcttcttgttctgtattcacattgttttgtgtttcctgattcatgttctcatcctcaatttctgaactagcggagttgttagcattttctgctgatagggattgttcttctggtgggctaaacagctttttttcaacttctttactggctttacccactaattctttggatgttatcagaccagcttgcacattttgttctgcttgtcgtaaccgttgtaaccaattggggtctttaacttcgagtacgtcttttgttgtatctggtaggagcctacgtttttcagttttggtgacagttttagtgtagtcaacaactcggcctccaaattcgccaccaattcttcctcctttactggtacctgtagaggaaaactcagcaggagcgcccctctgatcatgatacataccaaaaacatctgtatgagccattcttgatgtttctgcccctatgagtacgctaccaggtaatgttaagcttgggggtctatagtaaatataaatatgcccatgtctgccatcgggtaggatgacgtcacctgcgagatcttcattccccaatccgccaagaggtatatccataccatagtgttttatagtgcttttcaacccggttttacccttgacatcaaatgtattactcttttcctcttctaatgaactttcagttactttgacattatgactagaagcgattctggtatctactttagctttataatggtcactcttgttgtttggatcttttatcttattgtatgattgaggttttctagttaggtcggattcaggtgaagcaccaaaaagccattgaataaactcattttcgttttcatcttgtttaataggtggtaagttaatcatgacacgccctccgtgagagagagcaactgcaactgattcatcccaatccttaaaaatgttttgtttttgatcctctctatatttcaaaccatcatgaagaatgataaaaattcgtcgcagaatactattagctgattcggtttgctctttgtatttttctaaactttcatcttcactgtttgtctgattgtcaagtgtttgctcccacattttcgtatccttttcataaatatcctttttgtgttcctgactacctttcttcaactcgttggcttcataacgcaaataccctggagtttggcggaatttttcatccttaatacctagatctcgttgatatgtagcaatttgaagacgcttaataggacttaacactgcctcaccacggacatcgggcatcagtccaacagtcattttcctaaaatcatgttcttcgactctctcccaatcaccaaagacttttttgtctacggctatctctgctacttcttcctgtgtgagcataccattttgagataaaaaggtttttccgtttggtatgttacttaattcttctatagccttaactgcttcatctggcaaaaactgtctttttaaatctatttgtttagcaagatccatgctctctgttttttccttaccatgcttatctttaaatttacgcttctcaacttttagcaagtctttgacaatttctgtggagcgtttttttgtcccctctttttcatcattttcagtttttacatcactttcttttacccgacttttctctggaatataagttccatataattgcaatcgggtcgctcgaatatattgaggaggattactatctttaattcgataccacttattattgcccgtagcttctattttatggtcttttggatcatcactaatttcaatttcttgaccagatttatattttgcccccttatttttaagactttcatctctagcctgagcgttgtctttgaccgtatatttcttcatttgcaacataactgaattagaacctgtagaatgtgttacagattctcttttagattgaattggactcgctccttgctgcacaacatgggttaattcatgggcaattaattcctgtccacttcgacttcccggattatattctccccgtttaaaaaacaaatttggcccggttgcaaaggcgcgggaactcagggaacgatttaatttatctgattgactatcagtatgtactttcactccactaaaatctgcccccattgcttttcccatcttctgttgcagtcccgcatctaggggacttccaccacttttagcactttgaatagttgtttctatatctgttgaaactgcacccccacccagggttttattttgggatttagcttgaatttcttcttcttctccttctctttgaatagcagaattatcaggtttagcttgaatttcttcctcttcttcctgacgttgtactcctttagaagatgtggctttttctgtagcaggagtattaatttttttgaccactttttcagctacaatatctgcttcctgttcatatttgtccccagcggcgccaacggttaattttttttgtagggataaattaaatttaggttgtattctggctgctgactcatctgtatttcccgaaatcgggatttcagcaaaattaaaaccttgttttttctgtatttgctgatggtttatttcttgggtttggggtttctgtggcgctgcgagggcgttgtcca"""
+        text_list = list(text)
+        i = 1
+        while (i * 100) < len(text_list):
+            text_list.insert((i * 100) - 1, '\n')
+            i += 1
+        num_data['seq'] = ''.join(text_list)
+        data = num_data
+        self.send_response_data(MesCode.success, data, 'success get data')
 
+
+class WebHandler(CustomBasicHandler):
     async def post_process(self):
         num_data = {}
         self.send_response_data(MesCode.success, num_data, 'success post data')

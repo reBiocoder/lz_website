@@ -35,8 +35,8 @@
           <q-tab name="environment" label="GENE EXPRESSION"/>
           <q-tab name="jbrowse" label="JBrowse"/>
           <q-tab name="homologs" label="homologs"/>
-          <q-tab name="references" label="references"/>
           <q-tab name="sequences" label="sequences"/>
+          <q-tab name="references" label="references"/>
           <q-tab name="mutants" label="mutants"/>
 
         </q-tabs>
