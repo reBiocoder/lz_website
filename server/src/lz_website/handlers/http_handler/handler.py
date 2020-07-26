@@ -246,6 +246,8 @@ class SearchOneHandler(CustomBasicHandler):
                     data.update({"ref_seq_no": v})
                 elif k == 'Chr':
                     data.update({"chr": v})
+                elif k == 'Strand':
+                    data.update({"strand": v})
                 tmp = {k: v}
                 result.append(tmp)
             # 切分列表
@@ -463,17 +465,60 @@ class HomologousHandler(CustomBasicHandler):
 
 
 class SequenceHandler(CustomBasicHandler):
-    async def post_process(self, *args, **kwargs):
-        num_data = {'title': '>GCF_000009725.1 [NC_000911.1:2300115..231446; +; -2068668bp]'}
-        text = """tattcgttttcttcttgttctgtattcacattgttttgtgtttcctgattcatgttctcatcctcaatttctgaactagcggagttgttagcattttctgctgatagggattgttcttctggtgggctaaacagctttttttcaacttctttactggctttacccactaattctttggatgttatcagaccagcttgcacattttgttctgcttgtcgtaaccgttgtaaccaattggggtctttaacttcgagtacgtcttttgttgtatctggtaggagcctacgtttttcagttttggtgacagttttagtgtagtcaacaactcggcctccaaattcgccaccaattcttcctcctttactggtacctgtagaggaaaactcagcaggagcgcccctctgatcatgatacataccaaaaacatctgtatgagccattcttgatgtttctgcccctatgagtacgctaccaggtaatgttaagcttgggggtctatagtaaatataaatatgcccatgtctgccatcgggtaggatgacgtcacctgcgagatcttcattccccaatccgccaagaggtatatccataccatagtgttttatagtgcttttcaacccggttttacccttgacatcaaatgtattactcttttcctcttctaatgaactttcagttactttgacattatgactagaagcgattctggtatctactttagctttataatggtcactcttgttgtttggatcttttatcttattgtatgattgaggttttctagttaggtcggattcaggtgaagcaccaaaaagccattgaataaactcattttcgttttcatcttgtttaataggtggtaagttaatcatgacacgccctccgtgagagagagcaactgcaactgattcatcccaatccttaaaaatgttttgtttttgatcctctctatatttcaaaccatcatgaagaatgataaaaattcgtcgcagaatactattagctgattcggtttgctctttgtatttttctaaactttcatcttcactgtttgtctgattgtcaagtgtttgctcccacattttcgtatccttttcataaatatcctttttgtgttcctgactacctttcttcaactcgttggcttcataacgcaaataccctggagtttggcggaatttttcatccttaatacctagatctcgttgatatgtagcaatttgaagacgcttaataggacttaacactgcctcaccacggacatcgggcatcagtccaacagtcattttcctaaaatcatgttcttcgactctctcccaatcaccaaagacttttttgtctacggctatctctgctacttcttcctgtgtgagcataccattttgagataaaaaggtttttccgtttggtatgttacttaattcttctatagccttaactgcttcatctggcaaaaactgtctttttaaatctatttgtttagcaagatccatgctctctgttttttccttaccatgcttatctttaaatttacgcttctcaacttttagcaagtctttgacaatttctgtggagcgtttttttgtcccctctttttcatcattttcagtttttacatcactttcttttacccgacttttctctggaatataagttccatataattgcaatcgggtcgctcgaatatattgaggaggattactatctttaattcgataccacttattattgcccgtagcttctattttatggtcttttggatcatcactaatttcaatttcttgaccagatttatattttgcccccttatttttaagactttcatctctagcctgagcgttgtctttgaccgtatatttcttcatttgcaacataactgaattagaacctgtagaatgtgttacagattctcttttagattgaattggactcgctccttgctgcacaacatgggttaattcatgggcaattaattcctgtccacttcgacttcccggattatattctccccgtttaaaaaacaaatttggcccggttgcaaaggcgcgggaactcagggaacgatttaatttatctgattgactatcagtatgtactttcactccactaaaatctgcccccattgcttttcccatcttctgttgcagtcccgcatctaggggacttccaccacttttagcactttgaatagttgtttctatatctgttgaaactgcacccccacccagggttttattttgggatttagcttgaatttcttcttcttctccttctctttgaatagcagaattatcaggtttagcttgaatttcttcctcttcttcctgacgttgtactcctttagaagatgtggctttttctgtagcaggagtattaatttttttgaccactttttcagctacaatatctgcttcctgttcatatttgtccccagcggcgccaacggttaattttttttgtagggataaattaaatttaggttgtattctggctgctgactcatctgtatttcccgaaatcgggatttcagcaaaattaaaaccttgttttttctgtatttgctgatggtttatttcttgggtttggggtttctgtggcgctgcgagggcgttgtcca"""
+    async def get_process(self, *args, **kwargs):
+        """
+        首次初始化加载， 加载核酸序列和蛋白质序列
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        num_data = {}
+        locus_tag = self.data["locus_tag"]
+        refseq_no = self.data["refseq_no"]
+        chr = self.data["chr"]
+        strand = self.data["strand"]
+        start = self.data["start"]
+        end = self.data["end"]
+        Lstart = self.data["Lstart"]
+        Lend = self.data["Lend"]
+        sequence = script.Sequence(refseq_no, chr, start, end, Lstart, Lend, strand)
+        seq = sequence.get_json_data()
+        text = seq["seq"]
         text_list = list(text)
-        i = 1
-        while (i * 100) < len(text_list):
-            text_list.insert((i * 100) - 1, '\n')
-            i += 1
         num_data['seq'] = ''.join(text_list)
-        data = num_data
-        self.send_response_data(MesCode.success, data, 'success get data')
+        num_data['title'] = seq['title']
+        num_data['color_start'] = seq['color_start']
+        num_data['color_end'] = seq['color_end']  # 以上，核酸相关数据发送完成
+        #  以下为蛋白质相关数据
+        faa_data = await sequence.get_faa_data(locus_tag)
+        num_data['faa_title'] = faa_data[0]
+        num_data['faa_content'] = faa_data[1]
+        self.send_response_data(MesCode.success, num_data, 'success get data')
+
+    async def post_process(self, *args, **kwargs):
+        """
+        给用户提供能够自己移动sequence的功能
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        num_data = {}
+        refseq_no = self.data["refseq_no"]
+        chr = self.data["chr"]
+        strand = self.data["strand"]
+        start = self.data["start"]
+        end = self.data["end"]
+        Lstart = self.data["Lstart"]
+        Lend = self.data["Lend"]
+        sequence = script.Sequence(refseq_no, chr, start, end, Lstart, Lend, strand)
+        seq = sequence.get_json_data()
+        text = seq["seq"]
+        text_list = list(text)
+        num_data['seq'] = ''.join(text_list)
+        num_data['title'] = seq['title']
+        num_data['color_start'] = seq['color_start']
+        num_data['color_end'] = seq['color_end']  # 以上，核酸相关数据发送完成
+        self.send_response_data(MesCode.success, num_data, 'success get data')
 
 
 class WebHandler(CustomBasicHandler):

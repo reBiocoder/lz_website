@@ -57,12 +57,18 @@
             <homologs :locus_tag.sync="locus_tag"></homologs>
           </q-tab-panel>
 
-          <q-tab-panel name="references">
-            <references></references>
+          <q-tab-panel name="sequences">
+            <sequences :ref_no.sync="refSeqNo"
+                       :chr.sync="oldChr"
+                       :strand.sync="oldStrand"
+                       :Lstart.sync="oldStart"
+                       :Lend.sync="oldEnd"
+                       :locus_tag.sync="locus_tag"
+            ></sequences>
           </q-tab-panel>
 
-          <q-tab-panel name="sequences">
-            <sequences></sequences>
+          <q-tab-panel name="references">
+            <references></references>
           </q-tab-panel>
 
           <q-tab-panel name="mutants">
@@ -103,6 +109,7 @@
         oldStart: null,
         oldEnd: null,
         oldChr: null,
+        oldStrand: null,
       }
     },
     methods: {
@@ -126,6 +133,7 @@
         this.oldStart = res.data.data.start
         this.oldEnd = res.data.data.end
         this.oldChr = res.data.data.chr
+        this.oldStrand = res.data.data.strand
         this.$q.loading.hide()
       })
     },

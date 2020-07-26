@@ -23,7 +23,7 @@
     </div>
     <q-inner-loading :showing="visible" >
       <q-spinner-gears size="50px" color="primary"/>
-      <p class="text-purple text-body1">The blastP is running in the background, please be patient!</p>
+      <p class="text-purple text-body1">The blastP is running, please wait for a few seconds...</p>
     </q-inner-loading>
   </div>
 </template>
