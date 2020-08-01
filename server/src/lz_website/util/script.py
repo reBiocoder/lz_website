@@ -85,8 +85,8 @@ class Sequence:
         return rev_seq
 
     def file_path(self):
-        base_path = '/home/xiaoming/Homologs/data'
-        # base_path = '/Users/sophia/PycharmProjects/lz/server'
+        #base_path = '/home/xiaoming/Homologs/data'
+        base_path = '/Users/sophia/PycharmProjects/lz/server'
         current_path = os.path.join(base_path, self.refseq_no)
         for root, dirs, files in os.walk(current_path):  # 该目录下只存在一个文件
             file_name = files[0]
@@ -140,8 +140,8 @@ class Sequence:
         :param locus_tag:
         :return:
         """
-        base_path = '/home/xiaoming/Homologs'
-        # base_path = '/Users/sophia/PycharmProjects/lz/server'
+        # base_path = '/home/xiaoming/Homologs'
+        base_path = '/Users/sophia/PycharmProjects/lz/server'
         file_path = os.path.join(base_path, 'cyano_db_20200611.faa')
         cmd = "grep " + str(locus_tag) + " -A 1 " + file_path
         proc = await asyncio.create_subprocess_shell(
