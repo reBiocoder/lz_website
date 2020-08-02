@@ -248,6 +248,8 @@ class SearchOneHandler(CustomBasicHandler):
                     data.update({"chr": v})
                 elif k == 'Strand':
                     data.update({"strand": v})
+                elif k == 'Protein_id':
+                    data.update({"protein_id": v})
                 tmp = {k: v}
                 result.append(tmp)
             # 切分列表

@@ -2,7 +2,9 @@
   <div>
     <div class="row" style="margin-bottom: 10px;">
       <div class="col-9">
+        <keep-alive include="sequence">
         <component  :is="child"
+                    :child_protein_id="protein_id"
                     :ref_no="ref_no"
                     :chr="chr"
                     :strand="strand"
@@ -15,6 +17,7 @@
                     :to="to"
         >
         </component>
+          </keep-alive>
       </div>
       <div class="col-3">
         <q-card class="q-ma-sm" style="background: #EAEAEA">
@@ -45,6 +48,11 @@
           <q-card-section>
             <div class="text-brown-14 text-bold" style="margin-bottom: 5px;">Further sequence analysis</div>
             <div class="row">
+              <q-btn @click="online_blastp" class="col-12 q-ma-sm" color="primary" label="Online BlastP" />
+              <q-btn @click="online_blastn" class="col-12 q-ma-sm" color="secondary" label="Online BlastN" />
+              <q-btn @click="online_blastx" class="col-12 q-ma-sm" color="amber" label="Online BlastX" />
+              <q-btn @click="local_blastp" class="col-12 q-ma-sm" color="deep-orange" label="Local BlastP" />
+              <q-btn class="col-12 q-ma-sm" color="purple" label="Interproscan" />
             </div>
           </q-card-section>
         </q-card>
@@ -57,6 +65,8 @@
   import http from '../../../api/display'
   import blastp from "components/display/base_component/child_component/blastp";
   import sequence from "components/display/base_component/child_component/sequence";
+  import blastn from "components/display/base_component/child_component/blastn";
+  import blastx from "components/display/base_component/child_component/blastx";
 
   export default {
     name: "sequences",
@@ -69,8 +79,29 @@
         seq:'',
       }
     },
+    watch:{
+    },
+    components:{
+      "child_sequence": sequence,
+      "blastp": blastp,
+      'blastn': blastn,
+      'blastx': blastx,
+    },
     methods: {
-      update_seq: function () {
+      local_blastp: function(){
+        this.$emit('local-blastp', 'homologs')
+      },
+      online_blastx: function(){  // 点击在线blastx按钮
+        this.child = 'blastx' //切换为blast组件
+      },
+      online_blastp: function(){  // 点击在线blastp按钮
+        this.child = 'blastp' //切换为blast组件
+      },
+      online_blastn: function(){  //点击在线blastn按钮
+        this.child = 'blastn'
+      },
+      update_seq: function () { //更新seq序列函数
+        this.child = 'child_sequence' //切换组件
         let send_data = {
           'refseq_no': this.ref_no,
           'chr': this.chr,
@@ -110,11 +141,7 @@
         })
       }
     },
-    components:{
-      "child_sequence": sequence,
-      "blastp": blastp,
-    },
-    props: ['ref_no', 'chr', 'strand', 'start', 'end', 'Lstart', 'Lend', 'locus_tag'],
+    props: ['ref_no', 'chr', 'strand', 'start', 'end', 'Lstart', 'Lend', 'locus_tag', 'protein_id'],
   }
 </script>
 

@@ -32,11 +32,11 @@
           active-color="black"
           class="bg-blue-14  text-white shadow-2"
         >
-          <q-tab name="environment" label="GENE EXPRESSION"/>
           <q-tab name="jbrowse" label="JBrowse"/>
-          <q-tab name="homologs" label="homologs"/>
           <q-tab name="sequences" label="sequences"/>
+          <q-tab name="homologs" label="homologs"/>
           <q-tab name="references" label="references"/>
+          <q-tab name="environment" label="GENE EXPRESSION"/>
           <q-tab name="mutants" label="mutants"/>
 
         </q-tabs>
@@ -45,16 +45,13 @@
 
         <q-tab-panels v-model="tab" :keep-alive="isHomologed" animated>
 
-          <q-tab-panel name="environment">
-            <environment :locus_tag.sync="locus_tag"></environment>
-          </q-tab-panel>
-
           <q-tab-panel name="jbrowse">
-            <jbrowse :ref_seq_no.sync="refSeqNo" :start.sync="oldStart" :end.sync="oldEnd" :chr="oldChr"></jbrowse>
-          </q-tab-panel>
+            <jbrowse :ref_seq_no.sync="refSeqNo"
+                     :start.sync="oldStart"
+                     :end.sync="oldEnd"
+                     :chr="oldChr">
 
-          <q-tab-panel name="homologs">
-            <homologs :locus_tag.sync="locus_tag"></homologs>
+            </jbrowse>
           </q-tab-panel>
 
           <q-tab-panel name="sequences">
@@ -64,7 +61,17 @@
                        :Lstart.sync="oldStart"
                        :Lend.sync="oldEnd"
                        :locus_tag.sync="locus_tag"
+                       :protein_id="oldProteinId"
+                       @local-blastp="local_blastp"
             ></sequences>
+          </q-tab-panel>
+
+          <q-tab-panel name="homologs">
+            <homologs :locus_tag.sync="locus_tag"></homologs>
+          </q-tab-panel>
+
+          <q-tab-panel name="environment">
+            <environment :locus_tag.sync="locus_tag"></environment>
           </q-tab-panel>
 
           <q-tab-panel name="references">
@@ -98,7 +105,7 @@
     data() {
       return {
         isHomologed: true,
-        tab: 'environment',
+        tab: 'jbrowse',
         code: "",
         panel: 'locus_tag',
         data1: null,
@@ -110,9 +117,13 @@
         oldEnd: null,
         oldChr: null,
         oldStrand: null,
+        oldProteinId: null,
       }
     },
     methods: {
+      local_blastp(data){
+        this.tab = data
+        },
       ...mapMutations(SCOPE, ['changeLocus_tag']),
       convertKey(key) {
         return convertKey(key)
@@ -134,6 +145,7 @@
         this.oldEnd = res.data.data.end
         this.oldChr = res.data.data.chr
         this.oldStrand = res.data.data.strand
+        this.oldProteinId = res.data.data.protein_id
         this.$q.loading.hide()
       })
     },

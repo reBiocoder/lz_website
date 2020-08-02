@@ -1,7 +1,7 @@
 <template>
   <div>
     <span class="setting-left">
-      <q-btn @click="into_blastp" style="background: goldenrod; color: white"
+      <q-btn @click="into_blastn" style="background: goldenrod; color: white"
              label="full screen"
       />
     </span>
@@ -12,7 +12,7 @@
       <q-inner-loading :showing="visible">
         <q-spinner-gears size="50px" color="primary"/>
         <p class="text-purple text-body1">
-        The online BlastP is loading,it can do some customization,please wait a few seconds...
+        The online BlastN is loading,it can do some customization,please wait a few seconds...
         </p>
     </q-inner-loading>
     </div>
@@ -20,7 +20,7 @@
 
 <script>
     export default {
-      name: "blastp",
+      name: "blastn",
       data(){
           return{
             bdTokenUrl: "",
@@ -28,12 +28,12 @@
           }
       },
       methods:{
-        into_blastp(){
+        into_blastn(){
           window.open(this.bdTokenUrl, "_blank")
         }
       },
       mounted() {
-        let url = `https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE=Proteins&PROGRAM=blastp&BLAST_PROGRAMS=blastp&QUERY=${this.child_protein_id}&LINK_LOC=protein&PAGE_TYPE=BlastSearch`
+        let url = `https://blast.ncbi.nlm.nih.gov/Blast.cgi?PAGE=Nucleotides&PROGRAM=blastn&QUERY=${this.chr}&DATABASE=nr&MEGABLAST=on&BLAST_PROGRAMS=blastn&LINK_LOC=nuccore&PAGE_TYPE=BlastSearch&QUERY_FROM=${this.from}&QUERY_TO=${this.to}`
         this.bdTokenUrl = url
         const oIframe = document.getElementById('blastp');
         const deviceHeight = document.documentElement.clientHeight;
@@ -51,7 +51,7 @@
         };
       }
       },
-      props:['child_protein_id'],
+      props:['chr', 'from', 'to'],
     }
 </script>
 
@@ -63,5 +63,4 @@
     position: absolute;
     height: 36px;
   }
-
 </style>
