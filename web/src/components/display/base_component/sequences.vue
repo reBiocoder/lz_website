@@ -3,21 +3,21 @@
     <div class="row" style="margin-bottom: 10px;">
       <div class="col-9">
         <keep-alive include="sequence">
-        <component  :is="child"
-                    :child_protein_id="protein_id"
-                    :ref_no="ref_no"
-                    :chr="chr"
-                    :strand="strand"
-                    :Lstart="Lstart"
-                    :Lend="Lend"
-                    :locus_tag="locus_tag"
-                    :re_seq="seq"
-                    :re_title="title"
-                    :from="from"
-                    :to="to"
-        >
-        </component>
-          </keep-alive>
+          <component :is="child"
+                     :child_protein_id="protein_id"
+                     :ref_no="ref_no"
+                     :chr="chr"
+                     :strand="strand"
+                     :Lstart="Lstart"
+                     :Lend="Lend"
+                     :locus_tag="locus_tag"
+                     :re_seq="seq"
+                     :re_title="title"
+                     :from="from"
+                     :to="to"
+          >
+          </component>
+        </keep-alive>
       </div>
       <div class="col-3">
         <q-card class="q-ma-sm" style="background: #EAEAEA">
@@ -48,11 +48,11 @@
           <q-card-section>
             <div class="text-brown-14 text-bold" style="margin-bottom: 5px;">Further sequence analysis</div>
             <div class="row">
-              <q-btn @click="online_blastp" class="col-12 q-ma-sm" color="primary" label="Online BlastP" />
-              <q-btn @click="online_blastn" class="col-12 q-ma-sm" color="secondary" label="Online BlastN" />
-              <q-btn @click="online_blastx" class="col-12 q-ma-sm" color="amber" label="Online BlastX" />
-              <q-btn @click="local_blastp" class="col-12 q-ma-sm" color="deep-orange" label="Local BlastP" />
-              <q-btn class="col-12 q-ma-sm" color="purple" label="Interproscan" />
+              <q-btn @click="local_interpro" class="col-12 q-ma-sm" color="purple" label="Interproscan"/>
+              <q-btn @click="local_blastp" class="col-12 q-ma-sm" color="deep-orange" label="Local BlastP"/>
+              <q-btn @click="online_blastp" class="col-12 q-ma-sm" color="primary" label="Online BlastP"/>
+              <q-btn @click="online_blastn" class="col-12 q-ma-sm" color="secondary" label="Online BlastN"/>
+              <q-btn @click="online_blastx" class="col-12 q-ma-sm" color="amber" label="Online BlastX"/>
             </div>
           </q-card-section>
         </q-card>
@@ -67,6 +67,7 @@
   import sequence from "components/display/base_component/child_component/sequence";
   import blastn from "components/display/base_component/child_component/blastn";
   import blastx from "components/display/base_component/child_component/blastx";
+  import interpro from "components/display/base_component/child_component/interpro";
 
   export default {
     name: "sequences",
@@ -76,28 +77,31 @@
         from: this.Lstart,
         to: this.Lend,
         child: "child_sequence",
-        seq:'',
+        seq: '',
       }
     },
-    watch:{
-    },
-    components:{
+    watch: {},
+    components: {
       "child_sequence": sequence,
       "blastp": blastp,
       'blastn': blastn,
       'blastx': blastx,
+      'interpro': interpro,
     },
     methods: {
-      local_blastp: function(){
+      local_interpro: function () {
+        this.child = 'interpro'  //切换为互扫描组件
+      },
+      local_blastp: function () {
         this.$emit('local-blastp', 'homologs')
       },
-      online_blastx: function(){  // 点击在线blastx按钮
+      online_blastx: function () {  // 点击在线blastx按钮
         this.child = 'blastx' //切换为blast组件
       },
-      online_blastp: function(){  // 点击在线blastp按钮
+      online_blastp: function () {  // 点击在线blastp按钮
         this.child = 'blastp' //切换为blast组件
       },
-      online_blastn: function(){  //点击在线blastn按钮
+      online_blastn: function () {  //点击在线blastn按钮
         this.child = 'blastn'
       },
       update_seq: function () { //更新seq序列函数

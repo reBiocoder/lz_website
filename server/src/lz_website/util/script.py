@@ -85,8 +85,8 @@ class Sequence:
         return rev_seq
 
     def file_path(self):
-        #base_path = '/home/xiaoming/Homologs/data'
-        base_path = '/Users/sophia/PycharmProjects/lz/server'
+        base_path = '/home/xiaoming/Homologs/data'
+        # base_path = '/Users/sophia/PycharmProjects/lz/server'
         current_path = os.path.join(base_path, self.refseq_no)
         for root, dirs, files in os.walk(current_path):  # 该目录下只存在一个文件
             file_name = files[0]
@@ -140,8 +140,8 @@ class Sequence:
         :param locus_tag:
         :return:
         """
-        # base_path = '/home/xiaoming/Homologs'
-        base_path = '/Users/sophia/PycharmProjects/lz/server'
+        base_path = '/home/xiaoming/Homologs'
+        # base_path = '/Users/sophia/PycharmProjects/lz/server'
         file_path = os.path.join(base_path, 'cyano_db_20200611.faa')
         cmd = "grep " + str(locus_tag) + " -A 1 " + file_path
         proc = await asyncio.create_subprocess_shell(
@@ -156,11 +156,35 @@ class Sequence:
         return faa_title, faa_content
 
 
+class Interproscan(Homologous):
+    def __init__(self, ref_no, locus_tag):
+        super(Interproscan, self).__init__(locus_tag)
+        self.ref_no = ref_no
+
+    def command(self):
+        return "echo '200408@abc!' | sudo -S bash interpro_prepare.sh " + \
+               str(self.ref_no) + " " +str(self.locus_tag)
+        # return "echo '19990120' | sudo -S bash interpro_prepare.sh " + \
+        #        str(self.ref_no) + " " +str(self.locus_tag)
+
+    async def package_result(self):
+        result = {}
+        code, stdout, stderr = await self.shell()  # 异步调用shell
+        if code == 0:
+            result['code'] = 1
+            result['msg'] = 'successful!'
+            result['name'] = str(self.locus_tag) + '.html'
+        else:
+            result['code'] = 0
+            result['msg'] = 'opps, no hits found...'
+            result['name'] = ''
+        return result
+
+
 if __name__ == '__main__':
-    a = Sequence('GCF_000464785.1', 'NZ_KE734717.1', '14449', '17067',
-                 '14449', '17067', '+')
-    print(a.get_json_data())
-    # loop = asyncio.get_event_loop()
-    # a = Homologous('TX50_RS00020')
-    # stdcode, stdout, stderr = loop.run_until_complete(a.shell())
-    # print(a.file_to_json(stdcode, stdout, stderr))
+    # a = Sequence('GCF_000464785.1', 'NZ_KE734717.1', '14449', '17067',
+    #              '14449', '17067', '+')
+    # print(a.get_json_data())
+    loop = asyncio.get_event_loop()
+    a = Interproscan('GCF_000484535.1', 'GKIL_RS00780')
+    loop.run_until_complete(a.package_result())

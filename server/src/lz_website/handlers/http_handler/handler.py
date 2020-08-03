@@ -523,6 +523,15 @@ class SequenceHandler(CustomBasicHandler):
         self.send_response_data(MesCode.success, num_data, 'success get data')
 
 
+class InterproHandler(CustomBasicHandler):
+    async def post_process(self, *args, **kwargs):
+        res_no = self.data['ref_no']
+        locus_tag = self.data['locus_tag']
+        inter = script.Interproscan(res_no, locus_tag)
+        res = await inter.package_result()
+        self.send_response_data(MesCode.success, res, 'success send data')
+
+
 class WebHandler(CustomBasicHandler):
     async def post_process(self):
         num_data = {}
