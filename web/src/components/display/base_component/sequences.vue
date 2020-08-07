@@ -27,19 +27,23 @@
               <div class="justify-end">
                 <div class="col-6">
                   <label for="from">from:</label><input @keyup.enter="update_seq" v-model="from"
-                                                        style="width: 80px;margin-right: 5px;" id="from"
+                                                        style="width: 65px;margin-right: 5px;" id="from"
                                                         type="text"/>
                 </div>
               </div>
               <div class="justify-end">
-                <div class="col-5">
+                <div class="col-6">
                   <label for="to"></label>to:<input @keyup.enter="update_seq" v-model="to"
-                                                    style="width: 80px; margin-right: 10px;" id="to"
+                                                    style="width: 65px; margin-right: 10px;" id="to"
                                                     type="text"/>
                 </div>
               </div>
-              <div class="col-1">
+              <div class="col-3">
                 <button @click="update_seq" @keyup.enter="update_seq">Update</button>
+              </div>
+            </div>
+            <div class="row" style="margin-top: 5px;">
+              <div class="col-9">
               </div>
             </div>
           </q-card-section>
@@ -62,91 +66,110 @@
 </template>
 
 <script>
-  import http from '../../../api/display'
-  import blastp from "components/display/base_component/child_component/blastp";
-  import sequence from "components/display/base_component/child_component/sequence";
-  import blastn from "components/display/base_component/child_component/blastn";
-  import blastx from "components/display/base_component/child_component/blastx";
-  import interpro from "components/display/base_component/child_component/interpro";
+import http from '../../../api/display'
+import blastp from "components/display/base_component/child_component/blastp";
+import sequence from "components/display/base_component/child_component/sequence";
+import blastn from "components/display/base_component/child_component/blastn";
+import blastx from "components/display/base_component/child_component/blastx";
+import interpro from "components/display/base_component/child_component/interpro";
+import {mapMutations,mapState} from "vuex";
 
-  export default {
-    name: "sequences",
-    data() {
-      return {
-        title: '',
-        from: this.Lstart,
-        to: this.Lend,
-        child: "child_sequence",
-        seq: '',
+const SCOPE = process.env.APP_SCOPE_NAME
+
+export default {
+  name: "sequences",
+  data() {
+    return {
+      title: '',
+      from: this.Lstart,
+      to: this.Lend,
+      child: "child_sequence",
+      seq: '',
+    }
+  },
+  watch: {
+    default_sequence(n, o){
+      if(n === 'child_sequence'){  //切换成初始的默认sequence
+        this.child = n
       }
+    }
+  },
+  components: {
+    "child_sequence": sequence,
+    "blastp": blastp,
+    'blastn': blastn,
+    'blastx': blastx,
+    'interpro': interpro,
+  },
+  computed:{
+    ...mapState(SCOPE, ['default_sequence'])
+  },
+  methods: {
+    ...mapMutations(SCOPE, ['changeDnaSequence', 'changeDefaultSequence']),
+    local_interpro: function () {
+      this.child = 'interpro'  //切换为互扫描组件
+      this.changeDefaultSequence('interpro')
     },
-    watch: {},
-    components: {
-      "child_sequence": sequence,
-      "blastp": blastp,
-      'blastn': blastn,
-      'blastx': blastx,
-      'interpro': interpro,
+    local_blastp: function () {
+      this.$emit('local-blastp', 'homologs')
+      this.changeDefaultSequence('homologs')
     },
-    methods: {
-      local_interpro: function () {
-        this.child = 'interpro'  //切换为互扫描组件
-      },
-      local_blastp: function () {
-        this.$emit('local-blastp', 'homologs')
-      },
-      online_blastx: function () {  // 点击在线blastx按钮
-        this.child = 'blastx' //切换为blast组件
-      },
-      online_blastp: function () {  // 点击在线blastp按钮
-        this.child = 'blastp' //切换为blast组件
-      },
-      online_blastn: function () {  //点击在线blastn按钮
-        this.child = 'blastn'
-      },
-      update_seq: function () { //更新seq序列函数
-        this.child = 'child_sequence' //切换组件
-        let send_data = {
-          'refseq_no': this.ref_no,
-          'chr': this.chr,
-          'strand': this.strand,
-          'start': this.from,
-          'end': this.to,
-          'Lstart': this.Lstart,
-          'Lend': this.Lend,
-          "locus_tag": this.locus_tag,
-        }
-        http.get_sequence(send_data, (res) => {
-          if (res.data.code === "success") {
-            if (res.data.data === {}) {
-              this.$q.notify({
-                message: "Please Refresh!"
-              })
-            } else {  //成功得到数据
-              this.title = res.data.data['title']
-              let color_start = res.data.data['color_start']
-              let color_end = res.data.data['color_end']
-              let tmp_seq = res.data.data['seq']
-              if (color_start !== -1 && color_end !== -1) {
-                let orf = tmp_seq.toString().substring(color_start, color_end)
-                let color_orf = "<span class='text-uppercase' style='color: blue'>" + orf + "</span>"
-                //this.seq = orf
-                this.seq = tmp_seq.toString().replace(orf, color_orf)
-              } else {
-                this.seq = tmp_seq
-              }
-            }
-          } else {
+    online_blastx: function () {  // 点击在线blastx按钮
+      this.child = 'blastx' //切换为blast组件
+      this.changeDefaultSequence('blastx')
+    },
+    online_blastp: function () {  // 点击在线blastp按钮
+      this.child = 'blastp' //切换为blast组件
+      this.changeDefaultSequence('blastp')
+    },
+    online_blastn: function () {  //点击在线blastn按钮
+      this.child = 'blastn'
+      this.changeDefaultSequence('blastn')
+    },
+    update_seq: function () { //更新seq序列函数
+      this.child = 'child_sequence' //切换组件
+      let send_data = {
+        'refseq_no': this.ref_no,
+        'chr': this.chr,
+        'strand': this.strand,
+        'start': this.from,
+        'end': this.to,
+        'Lstart': this.Lstart,
+        'Lend': this.Lend,
+        "locus_tag": this.locus_tag,
+      }
+      http.get_sequence(send_data, (res) => {
+        if (res.data.code === "success") {
+          if (res.data.data === {}) {
             this.$q.notify({
-              message: "Error! Try again"
+              message: "Please Refresh!"
             })
+          } else {  //成功得到数据
+            this.title = res.data.data['title']
+            let color_start = res.data.data['color_start']
+            let color_end = res.data.data['color_end']
+            let tmp_seq = res.data.data['seq']
+            this.changeDnaSequence(tmp_seq)  //更新vuex
+            if (color_start !== -1 && color_end !== -1) {
+              let orf = tmp_seq.toString().substring(color_start, color_end)
+              let color_orf = "<span class='text-uppercase' style='color: blue'>" + orf + "</span>"
+              //this.seq = orf
+              this.seq = tmp_seq.toString().replace(orf, color_orf)
+            } else {
+              this.seq = tmp_seq
+            }
           }
+        } else {
+          this.$q.notify({
+            message: "Error! Try again"
+          })
+        }
 
-        })
-      }
-    },
-    props: ['ref_no', 'chr', 'strand', 'start', 'end', 'Lstart', 'Lend', 'locus_tag', 'protein_id'],
-  }
+      })
+    }
+  },
+  props: ['ref_no', 'chr', 'strand', 'start', 'end', 'Lstart', 'Lend', 'locus_tag', 'protein_id'],
+}
 </script>
 
 <style scoped>

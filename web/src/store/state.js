@@ -7,6 +7,9 @@ let state = {
   gene_start:null,
   gene_end:null,
   locus_tag: null, //locus_tag
+  dna_sequence: '', //下载DNA序列
+  protein_sequence: '', //下载蛋白质序列
+  default_sequence: '',  //点击sequence返回最初的值
 
   //后台管理所需要的数据
   click_title: "", //当前侧边栏所点击的栏目

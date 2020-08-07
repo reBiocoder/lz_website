@@ -11,7 +11,7 @@
       >
         <template v-slot:top-left>
           <div class="text-h6">The keyword you entered is: <span class="text-orange text-italic">{{keywords}}</span>,
-            the following are the search resultsspan <span class="text-purple">(species)</span>:
+            the following are the search results <span class="text-purple">(RefSeq Accession no. or species or Taxonomy ID)</span>:
           </div>
         </template>
         <template v-slot:top-right>
