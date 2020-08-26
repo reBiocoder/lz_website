@@ -10,8 +10,8 @@
         :filter="filter"
       >
         <template v-slot:top-left>
-          <div class="text-h6">The keyword you entered is: <span class="text-orange text-italic">{{keywords}}</span>,
-            the following are the search results <span class="text-purple">(RefSeq Accession no. or species or Taxonomy ID)</span>:
+          <div class="text-h6">The keyword: <span class="text-orange text-italic">{{keywords}}</span>
+            <span class="text-purple" style="margin-left: 10px; font-size: 14px;">(RefSeq Accession no. or Species or Taxonomy ID)</span>
           </div>
         </template>
         <template v-slot:top-right>

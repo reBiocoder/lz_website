@@ -81,13 +81,6 @@ const routes = [
         meta: {title: 'cyano--Cyanobacteria'}
       },
       {
-        path: 'cyano_detail/:code',
-        component: load('display/cyano_detail'),
-        props: true,
-        name: 'cyano_detail',
-        meta: {title: 'cyano_detail--Cyanobacteria'}
-      },
-      {
         path: 'search_species',
         component: load('display/base_component/search_species'),
         props: true,
@@ -100,6 +93,27 @@ const routes = [
         props: true,
         name: 'search_gene',
         meta: {title: 'search locus_tag'}
+      },
+      {
+        path: 'search_all',
+        component: load('display/base_component/search_all'),
+        props: true,
+        name: 'search_all',
+        meta: {title: 'search global'}
+      },
+      {
+        path: 'search_product',
+        component: load('display/base_component/search_product'),
+        props: true,
+        name: 'search_product',
+        meta: {title: 'search product'}
+      },
+      {
+        path: 'cyano_detail/:code',
+        component: load('display/cyano_detail'),
+        props: true,
+        name: 'cyano_detail',
+        meta: {title: 'cyano_detail--Cyanobacteria'}
       },
     ]
   }

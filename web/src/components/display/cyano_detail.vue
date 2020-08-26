@@ -62,6 +62,7 @@
                        :Lend.sync="oldEnd"
                        :locus_tag.sync="locus_tag"
                        :protein_id="oldProteinId"
+                       :old_locus_tag="old_locus_tag"
                        @local-blastp="local_blastp"
             ></sequences>
           </q-tab-panel>
@@ -118,6 +119,7 @@ export default {
       oldChr: null,
       oldStrand: null,
       oldProteinId: null,
+      old_locus_tag: null,
     }
   },
   methods: {
@@ -150,6 +152,7 @@ export default {
       this.oldChr = res.data.data.chr
       this.oldStrand = res.data.data.strand
       this.oldProteinId = res.data.data.protein_id
+      this.old_locus_tag = res.data.data.old_locus_tag
       this.$q.loading.hide()
     })
   },

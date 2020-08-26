@@ -249,6 +249,8 @@ class SearchOneHandler(CustomBasicHandler):
                     data.update({"strand": v})
                 elif k == 'Protein_id':
                     data.update({"protein_id": v})
+                elif k == 'Old_locus_tag':
+                    data.update({"old_locus_tag": v})
                 tmp = {k: v}
                 result.append(tmp)
             # 切分列表
@@ -556,6 +558,20 @@ class InterproHandler(CustomBasicHandler):
         inter = script.Interproscan(res_no, locus_tag)
         res = await inter.package_result()
         self.send_response_data(MesCode.success, res, 'success send data')
+
+
+class KEGGHandler(CustomBasicHandler):
+    async def post_process(self, *args, **kwargs):
+        res_no = self.data['ref_no']
+        data = await get_many_data('new_cyano_genomes', {'RefSeq_assm_no': str(res_no)})
+        if data:
+            kegg_no = data[0].get('KEGG_org', None)
+            if kegg_no:
+                self.send_response_data(MesCode.success, {"kegg_no": kegg_no}, 'success post data')
+            else:
+                self.send_response_data(MesCode.fail, {}, 'not found')
+        else:
+            self.send_response_data(MesCode.fail, {}, 'not found')
 
 
 class WebHandler(CustomBasicHandler):

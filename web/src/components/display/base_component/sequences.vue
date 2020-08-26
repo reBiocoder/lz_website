@@ -15,6 +15,7 @@
                      :re_title="title"
                      :from="from"
                      :to="to"
+                     :old_locus_tag="old_locus_tag"
           >
           </component>
         </keep-alive>
@@ -52,6 +53,7 @@
           <q-card-section>
             <div class="text-brown-14 text-bold" style="margin-bottom: 5px;">Further sequence analysis</div>
             <div class="row">
+              <q-btn @click="kegg" class="col-12 q-ma-sm" style="background: #FF0080; color: white" label="kegg"/>
               <q-btn @click="local_interpro" class="col-12 q-ma-sm" color="purple" label="Interproscan"/>
               <q-btn @click="local_blastp" class="col-12 q-ma-sm" color="deep-orange" label="Local BlastP"/>
               <q-btn @click="online_blastp" class="col-12 q-ma-sm" color="primary" label="Online BlastP"/>
@@ -72,7 +74,8 @@ import sequence from "components/display/base_component/child_component/sequence
 import blastn from "components/display/base_component/child_component/blastn";
 import blastx from "components/display/base_component/child_component/blastx";
 import interpro from "components/display/base_component/child_component/interpro";
-import {mapMutations,mapState} from "vuex";
+import kegg from "components/display/base_component/child_component/kegg";
+import {mapMutations, mapState} from "vuex";
 
 const SCOPE = process.env.APP_SCOPE_NAME
 
@@ -88,8 +91,8 @@ export default {
     }
   },
   watch: {
-    default_sequence(n, o){
-      if(n === 'child_sequence'){  //切换成初始的默认sequence
+    default_sequence(n, o) {
+      if (n === 'child_sequence') {  //切换成初始的默认sequence
         this.child = n
       }
     }
@@ -100,12 +103,17 @@ export default {
     'blastn': blastn,
     'blastx': blastx,
     'interpro': interpro,
+    'kegg': kegg,
   },
-  computed:{
+  computed: {
     ...mapState(SCOPE, ['default_sequence'])
   },
   methods: {
     ...mapMutations(SCOPE, ['changeDnaSequence', 'changeDefaultSequence']),
+    kegg: function () {
+      this.child = 'kegg'
+      this.changeDefaultSequence('kegg')
+    },
     local_interpro: function () {
       this.child = 'interpro'  //切换为互扫描组件
       this.changeDefaultSequence('interpro')
@@ -168,7 +176,7 @@ export default {
       })
     }
   },
-  props: ['ref_no', 'chr', 'strand', 'start', 'end', 'Lstart', 'Lend', 'locus_tag', 'protein_id'],
+  props: ['ref_no', 'chr', 'strand', 'start', 'end', 'Lstart', 'Lend', 'locus_tag', 'protein_id', 'old_locus_tag'],
 }
 </script>
 

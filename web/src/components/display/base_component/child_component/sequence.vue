@@ -86,7 +86,8 @@ export default {
     ...mapMutations(SCOPE, ['changeDnaSequence', 'changeProteinSequence']),
     dna_download() {  // 下载DNA文件
       let str_title = this.ref_no + '_' + this.from + '_' + this.to + '.txt'
-      const status = exportFile(str_title, this.dna_sequence)
+      let dna_text = `${this.title}\n${this.dna_sequence}`
+      const status = exportFile(str_title, dna_text)
       if (status === true) {
         // 浏览器允许
       } else {
@@ -96,7 +97,8 @@ export default {
     },
     protein_download() { //下载蛋白质文件
       let str_title = this.locus_tag + '_' + this.ref_no + '.txt'
-      const status = exportFile(str_title, this.protein_sequence)
+      let faa_text = `${this.faa_title}\n${this.faa_content}`
+      const status = exportFile(str_title, faa_text)
       if (status === true) {
         // 浏览器允许
       } else {

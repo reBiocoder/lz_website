@@ -1,7 +1,7 @@
 import motor.motor_asyncio
 import asyncio
 #123
-client = motor.motor_asyncio.AsyncIOMotorClient()
+client = motor.motor_asyncio.AsyncIOMotorClient(host='124.70.143.103', port=27010, username="root", password="200408@abc!", authSource="admin")
 handle = client["lz_database"]["new_cyano_genomes"]
 
 # async def test1():
@@ -24,8 +24,10 @@ async def test():
                         tmp[table_key[j]] = data[j]
                 else:  # 只可能是14
                     for j in range(len(table_key)):
-                        if j == 14:
+                        if j >= len(data):
                             tmp[table_key[j]] = ''
+                        else:
+                            tmp[table_key[j]] = data[j]
                 print("当前正在处理{}条数据:{}\n".format(i, len(line.decode("utf-8").strip().split(sep='\t'))))
                 table_res.append(tmp)
                 print("开始插入第{}条数据".format(i))

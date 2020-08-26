@@ -31,6 +31,9 @@ export default {
   search_cyano_genomes(param, cbk) { //搜索物种数据
     $post('/api/cyano_genomes/', param, cbk)
   },
+  global_search(param, cbk) { //全局搜索和搜索产物的结果
+    $post('/api/global_search/', param, cbk)
+  },
   get_cyano(param, cbk) {  //得到特定基因组的基因
     $post('/api/cyano/', param, cbk)
   },
@@ -41,11 +44,14 @@ export default {
     $post('/api/sequence/', param, cbk)
   },
   get_default_sequence(cbk, fail, send_data) { //得到序列
-    let base_url = new URL(process.env.http_base_url.toString()+'/api/sequence/')
+    let base_url = new URL(process.env.http_base_url.toString() + '/api/sequence/')
     base_url.search = new URLSearchParams(send_data)
     $get(base_url.toString(), cbk, fail)
   },
   get_interpro(param, cbk) { //得到互扫描的名称
     $post('/api/interpro/', param, cbk)
+  },
+  get_kegg(param, cbk) { //得到kegg的代码
+    $post('/api/kegg_no/', param, cbk)
   },
 }
