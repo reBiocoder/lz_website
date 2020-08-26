@@ -13,8 +13,17 @@
       }
     },
     props: ['ref_seq_no', 'start', 'end', 'chr'],
-    mounted() {
-      if (this.start !== null && this.end !== null && this.ref_seq_no !==null && this.chr !== null) {
+    watch:{
+      ref_seq_no(n, o){},
+      start(n,o){},
+      end(n,o){},
+      chr(n,o){
+        this.get_browse()
+      }
+    },
+    methods:{
+      get_browse(){
+        if (this.start !== null && this.end !== null && this.ref_seq_no !==null && this.chr !== null) {
         if((parseInt(this.start)-5000) > 0){
          this.loc = `${parseInt(this.start) - 5000}..${parseInt(this.end) + 5000}`
         }
@@ -40,6 +49,7 @@
         oIframe.onload = function () {
           //iframe加载完成后你需要进行的操作
         };
+      }
       }
     },
   }

@@ -246,6 +246,10 @@ class SearchOneHandler(CustomBasicHandler):
                     data.update({"ref_seq_no": v})
                 elif k == 'Chr':
                     data.update({"chr": v})
+                elif k == 'Strand':
+                    data.update({"strand": v})
+                elif k == 'Protein_id':
+                    data.update({"protein_id": v})
                 tmp = {k: v}
                 result.append(tmp)
             # 切分列表
@@ -462,11 +466,73 @@ class HomologousHandler(CustomBasicHandler):
             return self.send_response_data(MesCode.fail, data={'error': 'not locus_tag'}, info="homologous error")
 
 
-class WebHandler(CustomBasicHandler):
-    async def get_process(self):
+class SequenceHandler(CustomBasicHandler):
+    async def get_process(self, *args, **kwargs):
+        """
+        首次初始化加载， 加载核酸序列和蛋白质序列
+        :param args:
+        :param kwargs:
+        :return:
+        """
         num_data = {}
+        locus_tag = self.data["locus_tag"]
+        refseq_no = self.data["refseq_no"]
+        chr = self.data["chr"]
+        strand = self.data["strand"]
+        start = self.data["start"]
+        end = self.data["end"]
+        Lstart = self.data["Lstart"]
+        Lend = self.data["Lend"]
+        sequence = script.Sequence(refseq_no, chr, start, end, Lstart, Lend, strand)
+        seq = sequence.get_json_data()
+        text = seq["seq"]
+        text_list = list(text)
+        num_data['seq'] = ''.join(text_list)
+        num_data['title'] = seq['title']
+        num_data['color_start'] = seq['color_start']
+        num_data['color_end'] = seq['color_end']  # 以上，核酸相关数据发送完成
+        #  以下为蛋白质相关数据
+        faa_data = await sequence.get_faa_data(locus_tag)
+        num_data['faa_title'] = faa_data[0]
+        num_data['faa_content'] = faa_data[1]
         self.send_response_data(MesCode.success, num_data, 'success get data')
 
+    async def post_process(self, *args, **kwargs):
+        """
+        给用户提供能够自己移动sequence的功能
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        num_data = {}
+        refseq_no = self.data["refseq_no"]
+        chr = self.data["chr"]
+        strand = self.data["strand"]
+        start = self.data["start"]
+        end = self.data["end"]
+        Lstart = self.data["Lstart"]
+        Lend = self.data["Lend"]
+        sequence = script.Sequence(refseq_no, chr, start, end, Lstart, Lend, strand)
+        seq = sequence.get_json_data()
+        text = seq["seq"]
+        text_list = list(text)
+        num_data['seq'] = ''.join(text_list)
+        num_data['title'] = seq['title']
+        num_data['color_start'] = seq['color_start']
+        num_data['color_end'] = seq['color_end']  # 以上，核酸相关数据发送完成
+        self.send_response_data(MesCode.success, num_data, 'success get data')
+
+
+class InterproHandler(CustomBasicHandler):
+    async def post_process(self, *args, **kwargs):
+        res_no = self.data['ref_no']
+        locus_tag = self.data['locus_tag']
+        inter = script.Interproscan(res_no, locus_tag)
+        res = await inter.package_result()
+        self.send_response_data(MesCode.success, res, 'success send data')
+
+
+class WebHandler(CustomBasicHandler):
     async def post_process(self):
         num_data = {}
         self.send_response_data(MesCode.success, num_data, 'success post data')
