@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="ef08f12a-8abe-402c-8600-0525a0895ff6" name="124.70.143.103">
+        <fileTransfer rootFolder="/var/www" accessType="SFTP" host="gpu61.mistgpu.com" port="58500" sshConfigId="34a53686-2297-48ad-a69c-22fdf97dd392" sshConfig="mist@gpu61.mistgpu.com:58500 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="8d015b21-fde3-421d-98fb-4bb492008c6c" name="华为云">
+        <fileTransfer rootFolder="/var/www" accessType="SFTP" host="124.70.143.103" port="22" sshConfigId="7ffd7c40-226c-46ee-b256-90d3158ac1a2" sshConfig="zhou@124.70.143.103:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

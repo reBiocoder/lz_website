@@ -1,0 +1,1 @@
+(window["webpackJsonp"]=window["webpackJsonp"]||[]).push([[27],{cdd5:function(e,n,t){"use strict";t.r(n);var a=function(){var e=this,n=e.$createElement,t=e._self._c||n;return t("div")},c=[],r={name:"jbrowse"},s=r,o=t("2877"),u=Object(o["a"])(s,a,c,!1,null,"74a18f0d",null);n["default"]=u.exports}}]);
