@@ -167,10 +167,11 @@ class Interproscan(Homologous):
         self.ref_no = ref_no
 
     def command(self):
-        # return "echo '200408@abc!' | sudo -S bash interpro_prepare.sh " + \
-        #        str(self.ref_no) + " " +str(self.locus_tag)
-        return "echo '19990120' | sudo -S bash interpro_prepare.sh " + \
+        return "echo '200408@abc!' | sudo -S bash interpro_prepare.sh " + \
                str(self.ref_no) + " " +str(self.locus_tag)
+        #  开发代码
+        # return "echo '19990120' | sudo -S bash interpro_prepare.sh " + \
+        #        str(self.ref_no) + " " +str(self.locus_tag)
 
     async def package_result(self):
         result = {}
